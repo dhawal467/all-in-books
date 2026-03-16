@@ -1,4 +1,5 @@
 import React from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { useUiStore } from './stores/uiStore';
 import Toast from './components/Toast';
 import Modal from './components/Modal';
@@ -8,10 +9,16 @@ import BottomNav from './components/BottomNav';
 import StatusDot from './components/StatusDot';
 import EmptyState from './components/EmptyState';
 import EntryForm from './features/entries/EntryForm/EntryForm';
+import EntriesPage from './features/entries/EntriesPage';
+import EntryDetail from './features/entries/EntryDetail';
+import PartiesPage from './features/parties/PartiesPage';
+import PartyForm from './features/parties/PartyForm';
+import PartyStatement from './features/parties/PartyStatement';
 import { FileText } from 'lucide-react';
 
 function App() {
-  const { showToast, openModal, activeTab } = useUiStore();
+  const { showToast, openModal } = useUiStore();
+  const location = useLocation();
 
   return (
     <div className="min-h-screen bg-gray-50 pb-[80px] font-sans text-primary">
@@ -23,83 +30,25 @@ function App() {
 
       {/* Main Content Area */}
       <main className="pt-16 px-4 max-w-md mx-auto w-full">
-        {activeTab === 0 && (
-          <div className="space-y-4 pb-[80px]">
-            <h2 className="font-serif text-lg">UI Component Sandbox</h2>
-            
-            <div className="bg-white p-4 rounded-[12px] border border-[#B8D0E8] shadow-sm space-y-4">
-              <h3 className="font-medium">Toasts (min 44px target)</h3>
-              <div className="flex flex-wrap gap-2">
-                <button 
-                  onClick={() => showToast('Income recorded successfully!', 'success')}
-                  className="px-4 min-h-[44px] bg-income text-white rounded-lg active:scale-95 transition-transform font-medium"
-                >
-                  Success Toast
-                </button>
-                <button 
-                  onClick={() => showToast('Failed to save entry', 'error')}
-                  className="px-4 min-h-[44px] bg-expense text-white rounded-lg active:scale-95 transition-transform font-medium"
-                >
-                  Error Toast
-                </button>
-                <button 
-                  onClick={() => showToast('Please check the internet connection', 'warning')}
-                  className="px-4 min-h-[44px] bg-warning text-white rounded-lg active:scale-95 transition-transform font-medium"
-                >
-                  Warning Toast
-                </button>
-              </div>
+        <Routes>
+          <Route path="/" element={
+            <div className="flex items-center justify-center h-[60vh]">
+              <p className="text-gray-400">Dashboard (T-4.1 stub)</p>
             </div>
-
-            <div className="bg-white p-4 rounded-[12px] border border-[#B8D0E8] shadow-sm space-y-4">
-              <h3 className="font-medium">Overlays</h3>
-              <div className="flex flex-wrap gap-2">
-                <button 
-                  onClick={() => openModal('testModal')}
-                  className="px-4 min-h-[44px] bg-accent/10 text-accent font-medium rounded-lg active:scale-95 transition-transform"
-                >
-                  Open Modal
-                </button>
-                <button 
-                  onClick={() => openModal('testSheet')}
-                  className="px-4 min-h-[44px] bg-accent/10 text-accent font-medium rounded-lg active:scale-95 transition-transform"
-                >
-                  Open Sheet
-                </button>
-              </div>
+          } />
+          
+          <Route path="/entries" element={<EntriesPage />} />
+          
+          <Route path="/parties" element={<PartiesPage />} />
+          
+          <Route path="/more" element={
+            <div className="flex items-center justify-center h-[60vh]">
+              <p className="text-gray-400">More (Stub)</p>
             </div>
+          } />
 
-            <div className="bg-white p-4 rounded-[12px] border border-[#B8D0E8] shadow-sm">
-              <h3 className="font-medium mb-2">Empty State (No CTA)</h3>
-              <div className="border border-dashed border-gray-300 rounded-lg">
-                <EmptyState 
-                  icon={FileText} 
-                  title="No entries yet" 
-                  message="Your recent transactions will appear here." 
-                />
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-[12px] border border-[#B8D0E8] shadow-sm">
-              <h3 className="font-medium mb-2">Empty State (With CTA)</h3>
-              <div className="border border-dashed border-gray-300 rounded-lg">
-                <EmptyState 
-                  icon={FileText} 
-                  title="No entries yet" 
-                  message="Start by adding your first income or expense."
-                  ctaText="Add Entry"
-                  onCtaClick={() => showToast('CTA Clicked!', 'success')}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab !== 0 && (
-          <div className="flex items-center justify-center h-[60vh]">
-            <p className="text-gray-400">Content for Tab {activeTab}</p>
-          </div>
-        )}
+          <Route path="/auth/callback" element={() => null} />
+        </Routes>
       </main>
 
       {/* Overlays */}
@@ -127,10 +76,12 @@ function App() {
           <button className="flex items-center w-full min-h-[48px] px-4 rounded-lg hover:bg-gray-100 transition-colors text-left font-medium">
             Generate PDF
           </button>
-          <button className="flex items-center w-full min-h-[48px] px-4 rounded-lg hover:bg-red-50 text-expense transition-colors text-left font-medium">
-            Delete Entry
-          </button>
         </div>
+      </Sheet>
+
+      {/* Entry Detail Sheet */}
+      <Sheet name="entryDetail" title="Entry Details">
+        {() => <EntryDetail />}
       </Sheet>
 
       {/* Entry Form Sheet */}
@@ -138,8 +89,18 @@ function App() {
         {() => <EntryForm />}
       </Sheet>
 
+      {/* Party Form Sheet */}
+      <Sheet name="partyForm" title="New Party">
+        {() => <PartyForm />}
+      </Sheet>
+
+      {/* Party Statement Sheet */}
+      <Sheet name="partyStatement" title="Party Statement">
+        {() => <PartyStatement />}
+      </Sheet>
+
       {/* Navigation */}
-      <FAB onClick={() => openModal('entryForm')} />
+      {location.pathname !== '/parties' && <FAB onClick={() => openModal('entryForm')} />}
       <BottomNav />
     </div>
   );

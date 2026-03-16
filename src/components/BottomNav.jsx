@@ -1,16 +1,17 @@
 import React from 'react';
-import { useUiStore } from '../stores/uiStore';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, List, Users, MoreHorizontal } from 'lucide-react';
 
 export default function BottomNav() {
-  const { activeTab, setTab } = useUiStore();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navItems = [
-    { id: 0, label: 'Home', icon: Home },
-    { id: 1, label: 'Entries', icon: List },
+    { path: '/', label: 'Home', icon: Home },
+    { path: '/entries', label: 'Entries', icon: List },
     { id: 'fab-spacer', label: '', isSpacer: true },
-    { id: 2, label: 'Parties', icon: Users },
-    { id: 3, label: 'More', icon: MoreHorizontal },
+    { path: '/parties', label: 'Parties', icon: Users },
+    { path: '/more', label: 'More', icon: MoreHorizontal },
   ];
 
   return (
@@ -21,13 +22,13 @@ export default function BottomNav() {
             return <div key="spacer" className="w-[56px] shrink-0" />;
           }
 
-          const isActive = activeTab === item.id;
+          const isActive = location.pathname === item.path;
           const Icon = item.icon;
 
           return (
             <button
-              key={item.id}
-              onClick={() => setTab(item.id)}
+              key={item.path}
+              onClick={() => navigate(item.path)}
               className="flex flex-col items-center justify-center flex-1 min-w-[64px] h-[56px] gap-1 transition-colors"
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
