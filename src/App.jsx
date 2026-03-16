@@ -7,6 +7,7 @@ import FAB from './components/FAB';
 import BottomNav from './components/BottomNav';
 import StatusDot from './components/StatusDot';
 import EmptyState from './components/EmptyState';
+import EntryForm from './features/entries/EntryForm/EntryForm';
 import { FileText } from 'lucide-react';
 
 function App() {
@@ -132,8 +133,13 @@ function App() {
         </div>
       </Sheet>
 
+      {/* Entry Form Sheet */}
+      <Sheet name="entryForm" title="New Entry">
+        {() => <EntryForm />}
+      </Sheet>
+
       {/* Navigation */}
-      <FAB onClick={() => showToast('FAB Clicked! Opens Entry Form.', 'success')} />
+      <FAB onClick={() => openModal('entryForm')} />
       <BottomNav />
     </div>
   );

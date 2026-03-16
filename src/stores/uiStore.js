@@ -6,8 +6,10 @@ export const useUiStore = create((set) => ({
   toasts: [],
   modals: {},
   fabVisible: true,
+  lastUsedType: 'SALE',
 
   setTab: (tabIndex) => set({ activeTab: tabIndex }),
+  setLastUsedType: (type) => set({ lastUsedType: type }),
   
   showToast: (message, type = 'success') => {
     const id = generateUUID();
