@@ -1,0 +1,361 @@
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 1  
+ 
+ 
+📒  
+All in Books  
+Personal Accounting App — Android & Web  
+Product Requirements Document  •  v3.0  •  March 2026  •  FINAL  
+Currency  
+INR (₹) Only  Platform  
+Android + Web  iOS 
+Not Supported  Status  
+FINAL  
+ 
+Features removed vs v2: OCR auto -fill  •  Multi -book support  •  Cash book / Bank book module  
+  
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 2 1. Executive Summary & Vision  
+All in Books is a free, offline -first Progressive Web App (PWA) for personal and small -business accounting 
+in India. It runs on Android Chrome (installable PWA) and any desktop web browser — one codebase, no 
+backend server, no app store. Currency is fixed to INR (₹). The user always owns their data, stored on -
+device and backed up to their own Google Drive.  
+ 
+"All in Books should feel like the best ledger book you have ever used — except it lives on 
+your Android phone, never loses a page, and hands you a professional report whenever you 
+need one."  
+ 
+1.1  Resolved Design Decisions  
+ID Topic  Decision  
+D-001 App Name  All in Books  
+D-002 Platform  Android Chrome (PWA) + Desktop Web. iOS excluded — all 
+phases.  
+D-003 Currency  INR (₹) only. No multi -currency.  
+D-004 Invoice Template  One single professional template. No selector.  
+D-005 Historical Import  5-sheet .xlsx template. User fills → uploads once.  
+D-006 Attachment Size  Per-file cap 50 MB. App blocks and shows error if exceeded.  
+D-007 Recurring Entries  User must confirm each due entry via modal. No silent auto -posting.  
+D-008 OCR REMOVED from all phases.  
+D-009 Multi -book Support  REMOVED. Single book only. bookId="main" hardcoded.  
+D-010 Cash Book / Bank 
+Book  REMOVED. Out of scope for all phases.  
+  
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 3 2. User Personas  
+Persona 1 — Arjun (Kirana Shop Owner, age 34)  
+Situation:  Runs grocery store. 8 –15 vendors, 40 –60 customers/day. Physical bahi -khata. WhatsApp -
+comfortable.  
+Pain points:  Loses track of who owes money; cannot calculate monthly profit; no digital record for 
+CA. 
+Goals:  Record transactions in <30 sec; outstanding balances at a glance; WhatsApp reminders; 
+Excel export for CA.  
+ 
+Persona 2 — Priya (Freelance Designer, age 27)  
+Situation:  Issues invoices, receives partial payments, tracks expenses. Files ITR independently.  
+Pain points:  Invoice disputes; no paid/unpaid tracking; receipts lost before tax season.  
+Goals:  Professional invoices; attach expense receipts; clean GST summary at year -end. 
+ 
+Persona 3 — Meena (Tiffin Service Owner, age 42)  
+Situation:  Manages household budget and a tiffin delivery business. No accounting background.  
+Pain points:  Cannot separate personal/business expenses; does not know if tiffin is profitable; 
+forgets to collect.  
+Goals:  Simple daily entry; see who owes money; monthly profit view.  
+ 
+  
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 4 3. Feature Registry  
+P0 = MVP must -have (Phase 1). P1 = pre -public -release (Phase 1 –2). P2 = post -launch (Phase 2+). 
+OCR, multi -book, and cash book have been permanently removed.  
+ 
+ID Feature  Category  Pri Phase  
+F-001 Journal Entry — Sale Core P0 Phase 1  
+F-002 Journal Entry — Purchase  Core P0 Phase 1  
+F-003 Journal Entry — Expense  Core P0 Phase 1  
+F-004 Journal Entry — Receipt  Core P0 Phase 1  
+F-005 Journal Entry — Payment  Core P0 Phase 1  
+F-006 GST fields on all entries (rate, base, gst amount 
+auto -calc) Core P0 Phase 1  
+F-007 Master Ledger View  Core P0 Phase 1  
+F-008 Individual Party Ledger  Core P0 Phase 1  
+F-009 Party Management (name, phone, address, 
+GSTIN, opening balance)  Core P0 Phase 1  
+F-010 Party Statement + PDF Share via Android share 
+sheet  Core P0 Phase 1  
+F-011 Invoice Creation (line items, GST, discount, auto -
+number)  Core P0 Phase 1  
+F-012 Invoice PDF — single professional template, fully 
+on-device  Core P0 Phase 1  
+F-013 WhatsApp Share via Android native share sheet 
+(free, no API cost)  Core P0 Phase 1  
+F-014 Photo Bill Attachment (50 MB max, compress to 
+<400 KB)  Core P0 Phase 1  
+F-015 Offline Mode — full PWA functionality, zero 
+network dependency  Core P0 Phase 1  
+F-016 Excel Export — 7-sheet workbook via SheetJS  Core P0 Phase 1  
+F-017 Google Drive Auto -Backup (weekly, rolling 4 -
+week retention)  Core P0 Phase 1  
+F-018 P&L Statement — period picker + daily bar chart  Reports  P0 Phase 1  
+F-019 GST / Tax Summary by rate slab (5 / 12 / 18 / 28 %)  Reports  P0 Phase 1  
+F-020 Historical Import — 5-sheet Excel template 
+upload  Import  P0 Phase 1  
+F-021 Import Pre -import Validation Review Screen  Import  P0 Phase 1  
+F-022 Import Post -import Summary + 24 -hour Undo  Import  P0 Phase 1  
+F-023 Simplified Balance Sheet / Net Position view  Reports  P1 Phase 1 –2 
+F-024 Category Ledger View  Core P1 Phase 1 –2 
+F-025 Invoice Status Tracking (Draft / Sent / Partial / Paid)  Core P1 Phase 1 –2 
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 5 ID Feature  Category  Pri Phase  
+F-026 Recurring Entries with user -confirmation modal  Optional  P2 Phase 2  
+F-027 PWA Install — Android Chrome home screen icon  Core P0 Phase 1  
+F-028 Service Worker + Offline Asset Cache  Core P0 Phase 1  
+F-029 3-Step Onboarding Flow  Core P0 Phase 1  
+  
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 6 4. User Stories & Acceptance Criteria  
+4.1  Journal Entries  
+US-001  As a shop owner, I want to quickly record a sale transaction, so that I have an accurate 
+searchable record of all income.  
+Acceptance Criteria:  
+1. Entry form opens within 1 tap via FAB from any screen  
+2. Required fields: type and amount only — all others optional  
+3. Entry type defaults to last -used; date defaults to today (editable)  
+4. Transaction saved to IndexedDB immediately on tapping Save — no server call  
+5. Green toast 'Saved ✓' appears for 2 seconds and auto -dismisses  
+ 
+US-002  As a GST -registered business owner, I want to record the GST component separately from 
+the base amount, so that I can calculate my net GST liability at any time.  
+Acceptance Criteria:  
+6. GST toggle defaults Off; toggling On shows rate chips: 0%, 5%, 12%, 18%, 28%  
+7. User enters total (GST -inclusive); base and GST auto -calculated live via calcFromTotal()  
+8. Both baseAmount and gstAmount stored as separate numeric fields in IndexedDB  
+9. If GST off, gstRate and gstAmount stored as null — not zero  
+10. GST breakdown visible in entry detail, ledger export, and GST Summary report  
+ 
+US-003  As a user, I want to attach a photo of a bill to any entry, so that I have a permanent digital 
+copy without keeping paper.  
+Acceptance Criteria:  
+11. Camera (Android) or gallery file selection available on every entry form  
+12. Files over 50 MB blocked with toast error: 'File too large. Max size is 50 MB.'  
+13. Valid attachments compressed to under 400 KB before IndexedDB storage  
+14. Thumbnail shown in entry list; tapping opens full -res lightbox via Modal  
+ 
+4.2  Historical Data Import  
+US-004  As a user migrating from paper or Excel, I want to upload a structured Excel file to import all 
+historical data, so that I do not lose years of records when switching to All in Books.  
+Acceptance Criteria:  
+15. Import accessible from Settings → Data & Backup → Import Historical Data  
+16. App provides downloadable import template (.xlsx) — always available offline  
+17. Template has 5 sheets: Transactions, Party_Balances, Parties, GST_History, README  
+18. Pre-import review screen: green (valid), red (error) rows with per -cell error messages  
+19. User may proceed with valid rows only, or cancel entirely  
+20. Post-import summary: Imported N, Skipped (duplicates) N, Errors N  
+21. 'Undo Import' button available for 24 hours after import completes  
+ 
+4.3  Parties & Ledger  
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 7 US-005  As a user, I want to see a complete statement of all transactions with a party, so that I always 
+know exactly how much I owe or am owed.  
+Acceptance Criteria:  
+22. Statement: date, description, DR, CR, running balance starting from opening balance  
+23. Outstanding balance prominent at top — green (to receive) or red (to pay)  
+24. Share button generates PDF on -device, opens Android native share sheet  
+25. Statement filterable by date range; imported entries show "Imported" badge  
+ 
+4.4  Invoice Creation  
+US-006  As a freelancer, I want to create a professional invoice and share it via WhatsApp, so that my 
+client receives a clear payment request and I have a record.  
+Acceptance Criteria:  
+26. Fields: party, line items (name/qty/rate), GST toggle+rate, discount, due date, notes  
+27. Invoice number auto -increments: AIB -0001, AIB -0002 … (prefix editable in Settings)  
+28. PDF generated entirely on -device via jsPDF + html2canvas — no server call  
+29. Single professional template: logo top -left, party top -right, line -item table, bold total  
+30. 'Share via WhatsApp' opens Android native share sheet with PDF attached  
+31. 'Record as Sale' creates a linked journal entry and marks invoice as Sent  
+ 
+4.5  Offline Mode  
+US-007  As a user in a low -connectivity area, I want to use all app features without internet, so that I 
+am never blocked from recording transactions.  
+Acceptance Criteria:  
+32. App loads fully from service worker cache with zero network  
+33. All reads and writes go to IndexedDB — no network calls on any core operation  
+34. Offline dot visible in header when navigator.onLine is false  
+35. Google Drive sync fires automatically in background when connectivity restores  
+36. No loading spinners or degraded UI due to offline status  
+ 
+4.6  Export & Backup  
+US-008  As a user, I want to export all data to Excel and back it up to Google Drive weekly, so that I 
+never lose data and my accountant can read it.  
+Acceptance Criteria:  
+37. Excel export: 7 sheets — Transactions, Parties, Invoices, Categories, GST_Summary, 
+Monthly_Summary, Import_Log  
+38. All amounts stored as Excel numbers; all dates as Excel date values (not text strings)  
+39. File named: AllInBooks_Export_[MMM -YYYY].xlsx  
+40. Auto-backup: every Sunday on next app open; rolling 4 weekly + 3 monthly files retained  
+41. 'Manual 'Backup Now' button available; last backup timestamp shown in Settings  
+ 
+4.7  Reports  
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 8 US-009  As a user, I want to see P&L and GST summary for any period, so that I understand whether 
+my business made money and what I owe in tax.  
+Acceptance Criteria:  
+42. Period picker: This Week, This Month, Last Month, Custom Range  
+43. P&L: Total Revenue, Total Expenses, Net Profit/Loss as large numbers; daily bar chart below  
+44. GST Summary: Output GST, Input GST, Net Payable — broken down by rate slab  
+45. Both reports export to PDF in one tap  
+ 
+4.8  Recurring Entries (Phase 2)  
+US-010  As a user with fixed monthly expenses, I want to set up a recurring entry for rent or salary, so 
+that I do not forget predictable transactions.  
+Acceptance Criteria:  
+46. User sets: type, amount, party (optional), frequency (weekly/monthly), start date  
+47. On due date, on next app open, a confirmation modal appears: 'Record it now?'  
+48. User taps 'Record' (saves entry) or 'Skip This Time' (no entry, date advances)  
+49. No entry is ever created without explicit user confirmation — no silent auto -posting  
+  
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 9 5. Import Template Specification  
+Sheet 1: Transactions  
+Columns: date (YYYY -MM-DD, required), type (sale|purchase|expense|receipt|payment, required), 
+amount (positive number, required), baseAmount (optional), gstRate (0/5/12/18/28/blank, optional), 
+gstAmount (optional), partyName (optional), category (optional) , note (max 500 chars), invoiceNumber 
+(optional).  
+Sheet 2: Party_Balances  
+Columns: partyName (required), balanceDate (YYYY -MM-DD, required), balanceAmount (positive, 
+required), balanceType (toReceive|toPay, required), note (optional).  
+Sheet 3: Parties  
+Columns: name (required), phone (optional), address (optional), gstin (optional).  
+Sheet 4: GST_History  
+Columns: period (e.g. Q3 FY2025, required), outputGST (number, required), inputGST (number, 
+required), gstRate (optional), note (optional).  
+Sheet 5: README  
+Non-data sheet. Plain English step -by-step guide, field instructions, example data. Row 1=headers, Row 
+2=format hints, Row 3=example in all data sheets.  
+ 
+Validation Rules  
+Rule Condition  Behaviour  
+V-001 Required field blank 
+(date/type/amount)  Row: error. Not imported.  
+V-002 Invalid enum (type, 
+balanceType)  Row: error. Allowed values listed in message.  
+V-003 Amount is zero or negative  Row: error.  
+V-004 GST mismatch — base+gst 
+≠ total (±₹1 tolerance)  Row: warning. User can override.  
+V-005 Unknown party name  New party auto -created. Not flagged as error.  
+V-006 Duplicate transaction 
+(same 
+date+type+amount+party)  Row: skipped. Counted separately.  
+V-007 File exceeds 50 MB  Rejected before parsing.  
+V-008 File is not .xlsx  Rejected immediately.  
+V-009 Required sheet missing 
+(Transactions)  File-level error. No rows processed.  
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 10   
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 11 6. Data Model — IndexedDB via Dexie.js  
+Currency is always INR — no currency field. bookId is always "main" (single book, hardcoded). All tables 
+below.  
+ 
+Table: transactions  
+Dexie Index String  All Stored Fields  
+'++id, bookId, type, date, 
+partyId, categoryId, 
+isImported, importBatchId'  id, bookId, type, date, partyId, partyName, categoryId, amount, 
+baseAmount, gstRate, gstAmount, note, photoKey, invoiceId, isImported, 
+importBatchId, importedAt, createdAt, updatedAt  
+ 
+Table: parties  
+Dexie Index String  All Stored Fields  
+'++id, bookId, name'  id, bookId, name, phone, address, gstin, openingBalance, 
+openingBalanceDate, createdAt  
+ 
+Table: invoices  
+Dexie Index String  All Stored Fields  
+'++id, bookId, partyId, 
+status, invoiceNumber'  id, bookId, invoiceNumber, partyId, lineItems (JSON), subtotal, gstRate, 
+gstAmount, discount, total, issueDate, dueDate, status, notes, 
+linkedTransactionId  
+ 
+Table: categories  
+Dexie Index String  All Stored Fields  
+'++id, bookId, type'  id, bookId, name, type, color, isDefault  
+ 
+Table: importBatches  
+Dexie Index String  All Stored Fields  
+'++id, bookId, importedAt'  id, bookId, importedAt, rowsImported, rowsSkipped, rowsErrored, 
+undoneAt  
+ 
+Table: recurringEntries  
+Dexie Index String  All Stored Fields  
+'++id, bookId, 
+nextDueDate, isActive'  id, bookId, type, amount, partyId, categoryId, frequency, nextDueDate, 
+isActive, note  
+ 
+Table: attachments  
+Dexie Index String  All Stored Fields  
+'++id, transactionId'  id, transactionId, blob (Uint8Array), mimeType, originalName  
+ 
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 12   
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 13 7. Tech Stack & Architecture  
+Layer  Tool Rationale  
+Framework  React 18 + Vite  Fast builds; AI -coder friendly; one codebase for web + 
+PWA 
+Styling  Tailwind CSS  Utility -first; mobile -first; no separate CSS files  
+Local DB  Dexie.js (IndexedDB)  Offline -first; 22 KB; native to Android Chrome; no setup  
+State  Zustand  Zero boilerplate; async -friendly; per -store subscriptions  
+Excel I/O  SheetJS (xlsx CE)  Reads import template + writes export; free tier covers 
+all needs  
+PDF jsPDF + html2canvas  On-device invoice PDF; no server required; captures 
+React component  
+Cloud 
+Backup  Google Drive REST API 
++ OAuth 2.0 PKCE  User owns their data; free; no backend server needed  
+PWA  vite-plugin -pwa Service worker + web manifest auto -generated from 
+vite.config.js  
+Hosting  Vercel (free tier)  Zero-config CI/CD from GitHub; SPA routing via 
+vercel.json  
+Charts  Recharts  Declarative React charts; responsive; works with 
+Tailwind  
+Icons  Lucide React  Clean, tree -shakeable; consistent with Tailwind 
+aesthetic  
+Native 
+(Phase 2)  Capacitor  Same PWA codebase → Play Store APK with zero 
+rewrite  
+ 
+7.1  Data Flow — Local -First  
+User Action → Dexie.js (IndexedDB, instant, offline) → UI re -renders → [scheduled] SheetJS Export → 
+Google Drive Backup. No user -facing operation ever waits on a network response.  
+ 
+7.2  PWA Caching Strategy  
+• App assets (JS / CSS / fonts / icons): Cache -First — always served from service worker cache  
+• Google Drive API calls: Network -First with 10 -second timeout — falls back gracefully  
+• Initial JS bundle target: < 500 KB transferred (Vite bundle analyser)  
+• Android Chrome: PWA install prompt captured via beforeinstallprompt event  
+  
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 14 8. Non -Functional Requirements  
+Metric  Target  How Measured  
+App cold start (service worker 
+cached)  < 2 seconds  Lighthouse TTI, mid -range Android  
+Entry save to IndexedDB  < 100 ms  Perceived instant; no spinner  
+Excel export — 1,000 
+transactions  < 5 seconds  Chrome DevTools timing  
+Invoice PDF generation  < 3 seconds  Timed on -device render  
+Import of 500 template rows  < 8 seconds  Validation + DB write combined  
+Lighthouse PWA score  ≥ 90 Post service worker activation  
+Initial JS bundle  < 500 KB 
+transferred  Vite bundle analyser  
+ 
+Out of Scope — All Phases  
+• iOS Safari support  
+• OCR / auto -fill from photos (removed)  
+• Multi -book support (removed)  
+• Cash Book / Bank Book module (removed)  
+• Multi -user or collaborative access  
+• Double -entry bookkeeping  
+• Bank statement auto -parsing  
+• Inventory or stock tracking  
+• Multi -currency  
+All in Books  •  PRD v3.0  •  FINAL  •  March 2026  
+© All in Books 2026  •  Confidential  Page 15  

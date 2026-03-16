@@ -1,0 +1,1344 @@
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 1  
+ 
+ 
+🚀  
+All in Books  
+Technical Task Breakdown  
+Optimised for Antigravity IDE  •  Gemini 3 Pro + Claude Sonnet  •  v1.0  •  March 2026  
+How to use this document in Antigravity IDE  
+1.  Open Antigravity → Manager View. Feed this TTB and the TIP (Technical Implementation Plan) 
+as context files.  
+2.  Feed ONE Epic at a time. Never all 8 at once. After each CHECKPOINT, open a fresh agent 
+session for the next Epic.  
+3.  Agent colour coding  →  
+BLUE task cards  → Gemini 3 Pro in Manager View. Boilerplate, scaffolding, UI. Uses free -tier 
+tokens.  
+PURPLE task cards  → Claude Sonnet 4.6. Math -critical, security, complex logic. Reserve Claude 
+credits for these 8 tasks only.  
+4.  CHECKPOINT blocks are hard stops — do not proceed to the next Epic until all gate checks 
+pass. Prevents cascading failures and wasted tokens.  
+5.  PARALLEL: YES tasks can be spawned as concurrent agents in Manager View. Run them at the 
+same time as their listed companion task.  
+6.  Appendix A = agent routing quick -ref.  Appendix B = GitHub Issues push script.  Appendix C = 
+Frontend Design Skill for this project.  
+  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 2 EPIC 1: Foundation — Scaffold, DB, Utilities, Stores, Shared UI  
+Sprint 1  •  5 tasks  •  ~10 –14hh estimated  
+  FEED TO  Gemini 3 Pro — all tasks are boilerplate. No complex logic.  
+ 
+T-1.1  Scaffold Vite + React + Tailwind + Vercel  
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: None 
+Parallel: YES — T-1.2 parallel  
+Files What to build  
+package.json  
+vite.config.js  
+tailwind.config.js  
+index.html  
+src/main.jsx  
+src/App.jsx  
+vercel.json  Create Vite+React 18 project. Install all npm deps from TIP §9.2. Configure 
+Tailwind. Create full src/ folder structure from TIP §2 (empty files OK). Add 
+vercel.json SPA rewrite. Connect GitHub. Deploy to Vercel.  
+Acceptance Criteria  
+1. npm run dev shows blank React app with no console errors  
+2. npm run build succeeds and produces dist/  
+3. Vercel deployment URL is live  
+4. Tailwind class bg -blue-500 renders correctly in a test div  
+5. All folders from TIP §2 structure exist (empty is fine)  
+ 
+T-1.2  Utility functions — uuid, dates, currency, gst  
+Agent: Gemini 3 Pro   Effort: 1–2h   Depends: None 
+Parallel: YES — parallel with T -1.1 
+Files What to build  
+src/utils/uuid.js  
+src/utils/dates.js  
+src/utils/currency.js  
+src/utils/gst.js  Implement 4 utility files per TIP §6. Key: formatINR(1234567) must return 
+"₹12,34,567" using en -IN locale (Indian lakh format). 
+calcFromTotal(1180,18) returns {baseAmount:1000,gstAmount:180}. 
+today() returns YYYY -MM-DD string.  
+Acceptance Criteria  
+6. formatINR(1234567) returns "₹12,34,567" — lakh format, not Western  
+7. formatINRShort(150000) returns "₹1.5L"  
+8. calcFromTotal(1180,18) returns {baseAmount:1000,gstAmount:180}  
+9. calcFromBase(1000,18) returns {gstAmount:180,total:1180}  
+10. validateGST(1180,1000,180) returns true; validateGST(1180,1000,200) returns false  
+11. today() returns correct YYYY -MM-DD string  
+ 
+T-1.3  Dexie.js schema + seed categories  
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: T-1.1 
+Parallel: NO — T-1.4 depends on this  
+Files What to build  
+src/db/db.js  
+src/db/seed.js  src/db/db.js: Dexie instance "AllInBooks" with all 8 tables and index strings 
+from TIP §3. src/db/seed.js: on first run (categories empty for bookId "main"), 
+insert 10 default categories from TIP §3.2. Call seed() from main.jsx after Dexie 
+opens.  
+Acceptance Criteria  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 3 12. DevTools → IndexedDB → "AllInBooks" shows all 8 tables  
+13. categories table has 10 seeded rows on first launch  
+14. Seed runs once only — refresh does not add duplicates  
+15. db.transactions.add({}) resolves without error in browser console  
+ 
+T-1.4  All Zustand stores  
+Agent: Gemini 3 Pro   Effort: 3–4h   Depends: T-1.3 
+Parallel: YES — parallel once T -1.3 done  
+Files What to build  
+src/stores/transactionStore.js  
+src/stores/partyStore.js  
+src/stores/invoiceStore.js  
+src/stores/categoryStore.js  
+src/stores/bookStore.js  
+src/stores/uiStore.js  Implement 6 Zustand stores using pattern from TIP §4. bookId 
+= "main" hardcoded everywhere. transactionStore must include 
+getTodaySummary() per TIP §4.3. bookStore is a stub — 
+always returns "main". uiStore handles toasts, modals, 
+activeTab.  
+Acceptance Criteria  
+16. transactionStore.add({type:"sale",amount:500,date:"2026 -03-
+14",bookId:"main",isImported:false,createdAt:Date.now(),updatedAt:Date.now()}) saves to 
+IndexedDB  
+17. transactionStore.getTodaySummary() returns {totalIn,totalOut,net} as numbers  
+18. partyStore.search("ram") returns filtered party array from IndexedDB  
+19. invoiceStore.getNextInvoiceNumber() returns "AIB -0001" on fresh DB  
+20. uiStore.showToast("Saved","success") adds entry to toasts[]  
+ 
+T-1.5  Shared UI components  
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: T-1.1 
+Parallel: YES — parallel with T -1.4 
+Files What to build  
+src/components/Toast.jsx  
+src/components/Modal.jsx  
+src/components/Sheet.jsx  
+src/components/FAB.jsx  
+src/components/BottomNav.jsx  
+src/components/StatusDot.jsx  
+src/components/EmptyState.jsx  Implement 7 shared components per TIP §13 contracts. Toast: 
+reads uiStore.toasts, auto -dismisses 2.5s, bottom -centre above 
+nav. Sheet: slide -up from bottom with CSS transition. FAB: 
+circular, always floats above BottomNav. BottomNav: 5 tabs 
+(Home, Entries,  [FAB slot], Parties, More). StatusDot: 
+green=online, grey=offline. EmptyState: icon + title + message + 
+optional CTA.  
+Acceptance Criteria  
+21. Toast appears in correct colour and auto -dismisses after 2.5s  
+22. Sheet slides up smoothly; closes on backdrop tap  
+23. FAB remains visible above nav at all scroll positions  
+24. BottomNav highlights the active tab  
+25. StatusDot goes grey when DevTools Network set to Offline  
+26. EmptyState renders with and without CTA button  
+27. All interactive elements have min 44px touch target  
+⚠  Toast, FAB, BottomNav must be touch -friendly. Verify at 320px width in DevTools.  
+ 
+⏸  CHECKPOINT 1 — End of Epic 1 — STOP. VERIFY BEFORE CONTINUING  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 4 Agent instruction: pause execution. Run all checks below. Do not open the next Epic until every item 
+passes. Fix failures before continuing.  
+28. App runs via npm run dev and deploys to Vercel without errors  
+29. IndexedDB "AllInBooks" visible with all 8 tables and 10 seeded categories  
+30. formatINR(1234567) === "₹12,34,567" verified in browser console  
+31. calcFromTotal(1180,18) returns base=1000, gst=180  
+32. All Zustand stores can add/read data to/from IndexedDB  
+33. All 7 shared components render without errors at 320px width  
+  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 5 EPIC 2: Entry Form — The Core User Action  
+Sprint 2  •  5 tasks  •  ~12 –16hh estimated  
+  NOTE  T-2.2 (GSTFields) and T -2.5 (EntryForm assembly) must go to Claude — math -sensitive and integration -
+critical.  
+ 
+T-2.1  TypeSelector + CategoryChips  
+Agent: Gemini 3 Pro   Effort: 1–2h   Depends: T-1.4, T -1.5 
+Parallel: YES — parallel with T -2.2 
+Files What to build  
+src/features/entries/EntryForm/TypeSelector.jsx  
+src/features/entries/EntryForm/CategoryChips.jsx  TypeSelector: 5 -pill horizontal row — 
+SALE, PURCHASE, EXPENSE, 
+RECEIPT, PAYMENT. Selected pill has 
+primary fill. Calls onChange(type). 
+CategoryChips: reads categoryStore, 
+filters by income/expense, horizontal 
+scrollable chip row, most -recently -used 
+first, "+ Add" chip opens mini -modal to 
+create category.  
+Acceptance Criteria  
+34. All 5 pills render; tapping highlights it and fires onChange  
+35. CategoryChips shows correct chips for active entry type  
+36. + Add opens mini -modal; saving creates category via categoryStore  
+ 
+T-2.2  GSTFields — live GST calculation  
+Agent: Claude Sonnet 4.6   Effort: 2–3h   Depends: T-1.4 
+Parallel: YES — parallel with T -2.1 
+Files What to build  
+src/features/entries/EntryForm/GSTFields.jsx  GST toggle OFF by default. When ON: rate 
+chips 0%/5%/12%/18%/28%. Accepts "total" 
+prop from parent. On every change, calls 
+calcFromTotal(total,rate) from gst.js, displays 
+read-only "Base: ₹X" and "GST: ₹X" via 
+formatINR. Calls 
+onGSTChange(base,gst,rate). W hen toggled 
+OFF: calls onGSTChange(null,null,null).  
+Acceptance Criteria  
+37. ₹1,180 @ 18% shows Base: ₹1,000 and GST: ₹180  
+38. ₹1,000 @ 5% shows Base: ₹952.38 and GST: ₹47.62  
+39. 0% shows base = total, GST = ₹0  
+40. Toggle off calls onGSTChange(null,null,null)  
+41. All amounts in Indian lakh format (₹12,34,567)  
+42. Rate chips mutually exclusive — only one active at a time  
+⚠  Math -critical. Assign to Claude only. Test every rate manually.  
+T-2.3  PartyField — search -as-you-type with add -new 
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: T-1.4 
+Parallel: YES — parallel with T -2.2 
+Files What to build  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 6 src/features/entries/EntryForm/PartyField.jsx  200ms debounced search input calling 
+partyStore.search(). Dropdown shows 
+matching parties with outstanding balance in 
+small text. If no match: "Add [name] as new 
+party" option calls partyStore.add() and 
+selects new party. Calls 
+onChange(partyId,partyName).  Clearable — 
+clearing calls onChange(null,null). Field is 
+optional.  
+Acceptance Criteria  
+43. Shows matching parties within 200ms of typing  
+44. Outstanding balance shown per party in dropdown  
+45. "Add as new party" creates and selects party  
+46. Clearing fires onChange(null,null)  
+ 
+T-2.4  PhotoAttach — 50 MB guard + compression  
+Agent: Gemini 3 Pro   Effort: 1–2h   Depends: T-1.5 
+Parallel: YES — parallel with T -2.3 
+Files What to build  
+src/features/entries/EntryForm/PhotoAttach.jsx  File input accept="image/*". >50MB: show 
+error toast and reject. Otherwise: compress 
+to JPEG 0.7 via canvas, target <400KB, 
+store Uint8Array in attachments table, show 
+thumbnail. Tapping thumbnail opens full -res 
+lightbox via Modal. Calls 
+onAttach(attachmen tId). 
+Acceptance Criteria  
+47. <50MB file stores compressed attachment and shows thumbnail  
+48. >50MB shows error "File too large. Max size is 50 MB." — no attachment  
+49. Stored blob is under 400KB regardless of original size  
+50. Thumbnail tap opens full -res lightbox  
+51. onAttach called with correct IndexedDB attachment ID  
+ 
+T-2.5  EntryForm — full assembly  
+Agent: Claude Sonnet 4.6   Effort: 4–5h   Depends: T-2.1, T -2.2, T -2.3, T -2.4 
+Parallel: NO — assembles all above  
+Files What to build  
+src/features/entries/EntryForm/EntryForm.jsx  Assemble EntryForm: TypeSelector, 
+GSTFields, PartyField, CategoryChips, 
+PhotoAttach + large INR amount input 
+(triggers numeric keyboard on Android), date 
+picker (default today), note field. On Save: 
+validate (amount>0, type required), call 
+transactionStore .add() with gst fields as null 
+when GST off, show "Saved ✓" toast, call 
+onSave(entry) and onClose(). Rendered 
+inside Sheet, opened by FAB. defaultType 
+prop pre -selects last -used type from uiStore.  
+Acceptance Criteria  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 7 52. FAB opens EntryForm in bottom Sheet from any page  
+53. Sale ₹1,180 @ GST 18% saves baseAmount=1000, gstAmount=180 in IndexedDB  
+54. Plain expense with no party/GST/photo saves without errors  
+55. Empty amount shows inline validation error — no DB write, no toast  
+56. Post-save: toast appears, Sheet closes, transactionStore reloads  
+57. Amount field triggers numeric keypad on Android Chrome  
+58. defaultType prop pre -selects last -used entry type  
+⚠  Most complex assembly task. Assign to Claude. Test every save path.  
+ 
+⏸  CHECKPOINT 2 — End of Epic 2 — STOP. VERIFY BEFORE CONTINUING  
+Agent instruction: pause execution. Run all checks below. Do not open the next Epic until every item 
+passes. Fix failures before continuing.  
+59. FAB opens EntryForm in a bottom Sheet from both dashboard and entries page  
+60. Save SALE ₹1,180 @ 18% → confirm baseAmount=1000, gstAmount=180 in IndexedDB  
+61. Save EXPENSE with photo → confirm thumbnail visible in EntryDetail  
+62. Empty amount → validation error shown, no DB write  
+63. All form elements visible and usable at 320px with soft keyboard open  
+  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 8 EPIC 3: Entries List + Parties + Routing  
+Sprint 3  •  4 tasks  •  ~10 –13hh estimated  
+  FEED TO  Gemini 3 Pro — all list/display screens, no complex logic.  
+ 
+T-3.1  Entries list — EntryRow, EntryDetail, EntryList, EntriesPage  
+Agent: Gemini 3 Pro   Effort: 4–5h   Depends: T-2.5 
+Parallel: NO — T-3.4 depends on this  
+Files What to build  
+src/features/entries/EntryRow.jsx  
+src/features/entries/EntryDetail.jsx  
+src/features/entries/EntryList.jsx  
+src/features/entries/EntriesPage.jsx  EntriesPage: filter tabs 
+(All/Sales/Purchases/Expenses/Receipts/Payments) + 
+month picker (default current month). Calls 
+transactionStore.load(filter) on change. EntryList: 
+EntryRow items grouped by date with date headers. 
+EntryRow: party/category, type bad ge (colour -coded), 
+amount (green=in, red=out). Tapping opens EntryDetail 
+sheet. EntryDetail: full info, GST breakdown if present, 
+photo thumbnail, edit/delete.  
+Acceptance Criteria  
+64. List loads sorted by date descending  
+65. Filter tabs correctly filter by type  
+66. Entries grouped by date with headers (e.g. "14 March")  
+67. Green amounts for sales/receipts; red for purchases/expenses/payments  
+68. EntryDetail shows "Base: ₹1,000 | GST 18%: ₹180" when gstRate set  
+69. Delete removes entry and list refreshes  
+70. Photo thumbnail opens full -res lightbox in EntryDetail  
+ 
+T-3.2  Parties — PartyForm, PartyCard, PartiesPage  
+Agent: Gemini 3 Pro   Effort: 3–4h   Depends: T-1.4, T -1.5 
+Parallel: YES — parallel with T -3.1 
+Files What to build  
+src/features/parties/PartyForm.jsx  
+src/features/parties/PartyCard.jsx  
+src/features/parties/PartiesPage.jsx  PartiesPage: 3 sections — TO RECEIVE (green), TO 
+PAY (red), SETTLED (grey). Balance = openingBalance 
++ sum of linked transactions (positive for in -types, 
+negative for out -types). Real -time search bar. Floating + 
+opens PartyForm. PartyCard: name, balance, p hone. 
+PartyForm: name (required), phone, address, GSTIN.  
+Acceptance Criteria  
+71. 3 sections with correct party grouping  
+72. Outstanding balance per party computed correctly from transactions  
+73. Search filters list in real time  
+74. New party via PartyForm appears immediately in list  
+75. Party with zero balance appears in SETTLED section  
+ 
+T-3.3  PartyStatement — DR/CR table + running balance + PDF share  
+Agent: Gemini 3 Pro   Effort: 3–4h   Depends: T-3.2 
+Parallel: YES — parallel with T -3.2 
+Files What to build  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 9 src/features/parties/PartyStatement.jsx  Header: party name, phone, outstanding balance 
+(large, green/red). Date range filter (default: all 
+time). Table: Date, Description, DR (out -types), CR 
+(in-types), Running Balance. Balance starts from 
+openingBalance. Imported entries show "Imported" 
+badge. Share: generate PDF via 
+jsPDF+html2canvas, call 
+navigator.share({files:[pdf]}) — opens Android native 
+share sheet.  
+Acceptance Criteria  
+76. DR/CR running balance mathematically correct  
+77. Date range filter limits rows  
+78. Imported entries show "Imported" badge  
+79. Share opens Android native share sheet with PDF attached  
+80. PDF is readable with all statement rows  
+ 
+T-3.4  React Router + BottomNav wiring  
+Agent: Gemini 3 Pro   Effort: 1–2h   Depends: T-3.1, T -3.2 
+Parallel: NO — needs all pages  
+Files What to build  
+src/App.jsx  React Router: / (Dashboard stub), /entries, /parties, /more (stub). BottomNav 
+tabs navigate routes. FAB always opens EntryForm Sheet from any route. 
+Active tab highlighted. Add /auth/callback route (empty component for now — 
+used by DriveAuth in Epic 8).  
+Acceptance Criteria  
+81. All tabs navigate correctly  
+82. FAB opens entry form from all pages  
+83. Active tab highlighted  
+84. Back/forward browser navigation works  
+85. /auth/callback route exists  
+ 
+ 
+⏸  CHECKPOINT 3 — End of Epic 3 — STOP. VERIFY BEFORE CONTINUING  
+Agent instruction: pause execution. Run all checks below. Do not open the next Epic until every item 
+passes. Fix failures before continuing.  
+86. Entries list loads, filters, and groups correctly with live IndexedDB data  
+87. Parties list shows correct outstanding balance for 3 test parties  
+88. Party statement running balance correct — verify against a known data set  
+89. Party statement PDF shares via Android native share sheet  
+90. All BottomNav routes work; renders at 320px with no horizontal scroll  
+  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 10 EPIC 4: Dashboard  
+Sprint 4  •  3 tasks  •  ~8 –10hh estimated  
+  FEED TO  Gemini 3 Pro. Use pre -aggregated queries (getTodaySummary) — never filter all transactions in the 
+component.  
+ 
+T-4.1  CashFlowCards + OutstandingStrip  
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: T-1.4 
+Parallel: YES — parallel with T -4.2 
+Files What to build  
+src/features/dashboard/CashFlowCards.jsx  
+src/features/dashboard/OutstandingStrip.jsx  CashFlowCards: IN card (green, sale+receipt 
+sum) and OUT card (red, 
+purchase+expense+payment sum) using 
+transactionStore.getTodaySummary(). Net 
+Today below cards, green/red. 
+OutstandingStrip: two tappable rows — "🟢 To 
+Receive ₹X · N parties" and " 🔴 To Pay ₹X · N 
+parties" from partyStore. Tapping navigates to 
+filtered PartiesPage.  
+Acceptance Criteria  
+91. Correct today totals from live IndexedDB data  
+92. Net Today positive=green, negative=red  
+93. Outstanding strip totals correct  
+94. Tapping "To Receive" navigates to filtered PartiesPage  
+95. Figures update when new entry saved (Zustand subscription)  
+ 
+T-4.2  WeekChart — 7-day Recharts bar chart  
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: T-1.4 
+Parallel: YES — parallel with T -4.1 
+Files What to build  
+src/features/dashboard/WeekChart.jsx  Recharts BarChart, 7 days. Income bars green above 
+axis, expense bars red below axis (mirrored). X -axis: 
+abbreviated day names. Y -axis hidden. Below chart: 
+"This Week: Income ₹X  Expense ₹Y". Query 
+transactionStore for last 7 days grouped by date. 
+Responsi ve — fills container width.  
+Acceptance Criteria  
+96. 7 bars for last 7 consecutive days  
+97. Income green above axis; expense red below axis  
+98. Week totals below chart numerically correct  
+99. Chart is responsive — fills width  
+100. Empty days render as zero -height bars not gaps  
+ 
+T-4.3  Dashboard assembly + RecentEntries  
+Agent: Gemini 3 Pro   Effort: 3–4h   Depends: T-4.1, T -4.2 
+Parallel: NO — assembles above  
+Files What to build  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 11 src/features/dashboard/RecentEntries.jsx  
+src/features/dashboard/Dashboard.jsx  RecentEntries: last 5 transactions with 
+party/category name, type badge, amount 
+(green/red), relative time ("2 hrs ago", "Yesterday"). 
+"View All →" link. Dashboard: top bar (app name 
+left, StatusDot+settings right), date strip, 
+CashFlowCards, OutstandingSt rip, WeekChart, 
+RecentEntries. Route: /. Reloads data on window 
+focus.  
+Acceptance Criteria  
+101. Dashboard loads with live data on first render  
+102. RecentEntries shows last 5 with correct relative timestamps  
+103. All sections update when new entry saved via FAB  
+104. Data reloads when user navigates back to dashboard  
+105. StatusDot goes grey in DevTools offline mode  
+106. Readable at 320px with no overflow  
+ 
+ 
+⏸  CHECKPOINT 4 — End of Epic 4 — STOP. VERIFY BEFORE CONTINUING  
+Agent instruction: pause execution. Run all checks below. Do not open the next Epic until every item 
+passes. Fix failures before continuing.  
+107. Dashboard loads with correct today IN/OUT from live data  
+108. Week chart: add entries on 3 different days, verify chart updates correctly  
+109. Outstanding strip shows correct totals from party balances  
+110. StatusDot goes grey in DevTools → Network → Offline  
+111. RecentEntries shows correct last 5 entries in reverse order  
+  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 12 EPIC 5: Invoices + PDF + WhatsApp Share  
+Sprint 5  •  4 tasks  •  ~12 –16hh estimated  
+  CRITICAL  InvoicePreview MUST use inline styles only — no Tailwind. html2canvas cannot capture utility classes. T -
+5.1 and T -5.2 → Claude.  
+ 
+T-5.1  InvoicePreview — printable component (inline styles only)  
+Agent: Claude Sonnet 4.6   Effort: 3–4h   Depends: T-1.2 
+Parallel: NO — T-5.2 depends on this  
+Files What to build  
+src/features/invoices/InvoicePreview.jsx  Build InvoicePreview per TIP §11. Props: 
+{invoice,business,party}. USE ONLY INLINE 
+STYLES — zero Tailwind classes. html2canvas 
+needs computed styles. Layout: logo+name top -
+left, INVOICE+number+dates top -right, Bill To 
+section, line items table (zebra strip es), totals block 
+(subtotal, conditional GST row, conditional discount 
+row, TOTAL on dark banner), footer notes. All 
+amounts via formatINR(). Renders at 794px width.  
+Acceptance Criteria  
+112. Professional layout at 794px width  
+113. Logo optional — layout does not break without it  
+114. GST row renders only when gstRate > 0  
+115. Discount row renders only when discount > 0  
+116. TOTAL row has dark background and white bold text  
+117. Renders correctly with 1 line item and with 10 line items  
+118. Searching the file for "className" returns zero results  
+⚠  Zero Tailwind classes. Inline styles only. Violating this breaks PDF generation.  
+T-5.2  InvoicePDF service — html2canvas + jsPDF  
+Agent: Claude Sonnet 4.6   Effort: 2–3h   Depends: T-5.1 
+Parallel: YES — parallel with T -5.3 
+Files What to build  
+src/services/InvoicePDF.js  generate(invoiceData,business,party): create hidden off -screen div 
+at 794px, render InvoicePreview into it via createRoot, capture with 
+html2canvas {scale:2,useCORS:true}, write to jsPDF A4 portrait as 
+JPEG quality 0.92, return Blob URL. Remove hidden div after 
+capture. Function is async.  
+Acceptance Criteria  
+119. Resolves to a string starting with "blob:"  
+120. Opening Blob URL shows readable A4 portrait invoice PDF  
+121. PDF dimensions are 210mm × 297mm  
+122. Correct for invoices with and without GST  
+123. Hidden div removed from DOM after capture (verify in DevTools)  
+ 
+T-5.3  InvoiceForm + LineItemRow  
+Agent: Gemini 3 Pro   Effort: 3–4h   Depends: T-1.4, T -5.1 
+Parallel: YES — parallel with T -5.2 
+Files What to build  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 13 src/features/invoices/InvoiceForm.jsx  
+src/features/invoices/LineItemRow.jsx  InvoiceForm: PartyField (reuse), dynamic line items 
+(add/remove), GST toggle+rate chips, discount, due 
+date (default today+15), notes. LineItemRow: name, 
+qty, rate — amount = qty×rate auto -calculated. Totals 
+recalculate live. Invoice number from 
+invoiceSto re.getNextInvoiceNumber() (read -only). 
+"Preview" button opens InvoicePreview in Modal. 
+"Share via WhatsApp" calls InvoicePDF.generate() 
+then navigator.share({files:[pdf]}). "Record as Sale" 
+calls transactionStore.add() linked to invoice, 
+invoiceStore.updat eStatus(id,"sent").  
+Acceptance Criteria  
+124. 2 line items → correct subtotal, GST, total  
+125. GST 18% on ₹1,000 subtotal shows GST=₹180, TOTAL=₹1,180  
+126. "Preview" opens InvoicePreview in Modal  
+127. "Share via WhatsApp" opens Android native share sheet with PDF  
+128. "Record as Sale" creates linked journal entry type=sale  
+129. Invoice saves with auto -incremented number AIB -0001 
+130. Second invoice = AIB -0002 
+ 
+T-5.4  InvoiceList + InvoicesPage  
+Agent: Gemini 3 Pro   Effort: 1–2h   Depends: T-1.4 
+Parallel: YES — parallel with T -5.3 
+Files What to build  
+src/features/invoices/InvoiceList.jsx  
+src/features/invoices/InvoicesPage.jsx  InvoicesPage from More tab. "+ New Invoice" button. 
+Filter tabs: All, Draft, Sent, Partial, Paid. Card list: 
+party name, invoice number, total, colour -coded 
+status badge, issue date. Tapping opens InvoiceForm 
+pre-filled (edit mode).  
+Acceptance Criteria  
+131. All invoices listed with correct status badges  
+132. Badge colours: Draft=grey, Sent=blue, Partial=orange, Paid=green  
+133. Tapping opens pre -filled InvoiceForm  
+134. "+ New Invoice" opens blank InvoiceForm  
+ 
+ 
+⏸  CHECKPOINT 5 — End of Epic 5 — STOP. VERIFY BEFORE CONTINUING  
+Agent instruction: pause execution. Run all checks below. Do not open the next Epic until every item 
+passes. Fix failures before continuing.  
+135. Invoice with 2 line items + 18% GST → correct total  
+136. PDF generates — open Blob URL in new tab, confirm professional readable layout  
+137. "Share via WhatsApp" on Android opens share sheet with PDF attached  
+138. "Record as Sale" creates entry visible in EntriesPage  
+139. Second invoice number is AIB -0002 
+  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 14 EPIC 6: Reports + Excel Export  
+Sprint 6  •  5 tasks  •  ~12 –15hh estimated  
+  NOTE  P&L (T -6.2) and GST Summary (T -6.3) = Claude. Financial aggregation must be correct. Excel export and 
+other reports = Gemini.  
+ 
+T-6.1  PeriodPicker component  
+Agent: Gemini 3 Pro   Effort: 1–2h   Depends: T-1.5 
+Parallel: YES — parallel with T -6.2 
+Files What to build  
+src/features/reports/PeriodPicker.jsx  Segmented control: This Week, This Month, Last 
+Month, Custom Range. Each fires onChange(from,to) 
+as YYYY -MM-DD strings. Custom Range shows two 
+date inputs. Default: This Month.  
+Acceptance Criteria  
+140. Each option fires onChange with correct from/to dates  
+141. "This Month" spans 1st of current month to today  
+142. "Last Month" spans full previous calendar month  
+143. Custom Range date inputs work on Android  
+ 
+T-6.2  P&L Report — period aggregation + chart  
+Agent: Claude Sonnet 4.6   Effort: 3–4h   Depends: T-1.4, T -6.1 
+Parallel: YES — parallel with T -6.3 
+Files What to build  
+src/features/reports/ProfitLoss.jsx  Revenue = sale+receipt types. Expenses = 
+purchase+expense+payment types. Show Total Revenue 
+(green), Total Expenses (red), Net Profit/Loss (large, 
+green/red). Recharts BarChart: income green / expense 
+red, X -axis = date labels, responsive. Top 5 expense 
+categories sorted by amount desc. "Export PDF" 
+generates PDF of this component.  
+Acceptance Criteria  
+144. Correct Revenue/Expenses/Net for known test data  
+145. Net positive=green, negative=red  
+146. Bar chart shows income+expense bars per day  
+147. Top 5 categories sorted descending  
+148. "Export PDF" generates readable report PDF  
+149. Updates when PeriodPicker changes  
+⚠  Financial aggregation. Claude only. Verify against manually computed totals.  
+T-6.3  GST Summary Report — slab aggregation  
+Agent: Claude Sonnet 4.6   Effort: 2–3h   Depends: T-1.4, T -6.1 
+Parallel: YES — parallel with T -6.2 
+Files What to build  
+src/features/reports/GSTSummary.jsx  Query transactions where gstRate not null for period. 
+Group by slab (5/12/18/28). Per slab: Output GST 
+(sale+receipt), Input GST (purchase+expense), Net. 
+Totals row: Total Output, Total Input, Net GST Payable. 
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 15 Include imported GST_History rows for overlapping 
+periods. "Export PDF" button.  
+Acceptance Criteria  
+150. Correct Output/Input/Net for known test data  
+151. Slabs with no data show ₹0 — not hidden  
+152. Net GST Payable = Output − Input  
+153. Imported GST_History rows included  
+154. Updates when PeriodPicker changes  
+⚠  Tax calculation. Claude only. Test with known GST amounts.  
+T-6.4  Simplified Balance Sheet  
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: T-1.4, T -6.1 
+Parallel: YES — parallel with T -6.2 
+Files What to build  
+src/features/reports/BalanceSheet.jsx  Plain -language net position. What You Are Owed 
+(receivables), What You Owe (payables), Net Position. 
+Period revenue and expenses. No accounting jargon. 
+"Export PDF" button.  
+Acceptance Criteria  
+155. Correct receivables and payables totals  
+156. Net Position = receivables − payables  
+157. All labels in plain English (no Debit/Credit/Assets/Liabilities)  
+158. "Export PDF" works  
+ 
+T-6.5  ExportService — 7-sheet SheetJS Excel export  
+Agent: Gemini 3 Pro   Effort: 3–4h   Depends: T-1.3, T -1.4 
+Parallel: NO — reads all tables  
+Files What to build  
+src/services/ExportService.js  generate(bookId): read all Dexie tables, build Workbook with 7 
+sheets: Transactions (all fields), Parties (with computed 
+balance), Invoices (lineItems JSON -stringified), Categories, 
+GST_Summary (pivot by slab), Monthly_Summary (one row per 
+month: income/ex pense/net), Import_Log. Amounts as Excel 
+numbers, dates as Excel date values. 
+downloadNow(buffer,filename) triggers browser download. File: 
+AllInBooks_Export_[MMM -YYYY].xlsx.  
+Acceptance Criteria  
+159. File opens in Google Sheets without errors  
+160. Amounts are Excel numbers — not text strings  
+161. Dates are Excel date values — not text strings  
+162. All 7 sheets present with correct data  
+163. Downloads on Android Chrome  
+ 
+Also build ReportsPage.jsx (Gemini 3 Pro, ~1h): tab navigation across P&L / GST Summary / Balance 
+Sheet. From More tab. PeriodPicker shared across all 3 tabs.  
+ 
+⏸  CHECKPOINT 6 — End of Epic 6 — STOP. VERIFY BEFORE CONTINUING  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 16 Agent instruction: pause execution. Run all checks below. Do not open the next Epic until every item 
+passes. Fix failures before continuing.  
+164. P&L correct for 1 -month period with known test entries  
+165. GST Summary correct for entries with 5%, 12%, and 18% GST  
+166. Excel export opens in Google Sheets with all 7 sheets and correct data types  
+167. Verify amounts are Excel numbers not text  
+168. All 3 reports export to PDF correctly  
+169. Period picker change updates all 3 reports  
+  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 17 EPIC 7: Historical Data Import  
+Sprint 7  •  5 tasks  •  ~14 –18hh estimated  
+  NOTE  ImportService (T -7.2) = Claude — most logic -dense service in the app. Build T -7.1 first, it must exist before T -
+7.2. 
+ 
+T-7.1  Import template generator script  
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: T-1.1 
+Parallel: NO — T-7.2 depends on this  
+Files What to build  
+scripts/generateTemplate.js  
+src/assets/importTemplate.b64.js  Node.js script (not part of Vite build) per TIP §8.1. Build 5 -
+sheet .xlsx: Row 1=headers, Row 2=format hints, Row 
+3=example, Row 4+ = user data. Sheet 5 = README with 
+plain English instructions. Write base64 to 
+src/assets/importTemplate.b64.js as: export c onst 
+IMPORT_TEMPLATE_B64 = "...". Run once and commit the 
+generated file.  
+Acceptance Criteria  
+170. node scripts/generateTemplate.js runs without errors  
+171. src/assets/importTemplate.b64.js exports a non -empty string  
+172. Decoding and opening in Sheets shows all 5 sheets  
+173. Row 1=headers, Row 2=hints, Row 3=example in Transactions sheet  
+174. README sheet has readable plain English instructions  
+175. Script can be re -run to regenerate if schema changes  
+ 
+T-7.2  ImportService — parse, validate, commit, undo  
+Agent: Claude Sonnet 4.6   Effort: 5–6h   Depends: T-7.1, T -1.3 
+Parallel: NO — all import UI depends on this  
+Files What to build  
+src/services/ImportService.js  parse(file): read .xlsx, extract 4 data sheets, validate every row 
+against 9 rules (V -001 to V -009), return 
+{valid:[],errors:[],warnings:[],duplicates:[],totalRows:N}. Error 
+rows carry {rowNum,errors:[{col,rule,message}]}. Duplicate 
+detection: same date+ty pe+amount+partyName in IndexedDB. 
+GST mismatch tolerance = ₹1. Party auto -creation from Parties 
+sheet before writing transactions. commit(validRows,bookId): all 
+DB writes in single Dexie transaction with shared importBatchId. 
+undo(batchId): delete by impor tBatchId in one transaction.  
+Acceptance Criteria  
+176. Valid 10 -row sheet → 10 valid rows  
+177. Row missing "amount" → errors[], rule=V -001 
+178. Row with type="bad" → errors[], rule=V -002, message lists valid values  
+179. Row with amount= -500 → errors[], rule=V -003 
+180. Row where base+gst ≠ total ±₹1 → warnings[], rule=V -004 
+181. Duplicate row → duplicates[], not errors[]  
+182. commit() writes all rows in ONE Dexie transaction with shared importBatchId  
+183. undo(batchId) removes exactly those rows and no others  
+184. Party opening balances from Party_Balances sheet applied correctly  
+⚠  Most logic -dense service. Claude only. Test every validation rule individually.  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 18 T-7.3  ImportUpload + template download UI  
+Agent: Gemini 3 Pro   Effort: 1–2h   Depends: T-7.1 
+Parallel: YES — parallel with T -7.2 (UI only)  
+Files What to build  
+src/features/import/ImportUpload.jsx  
+src/features/import/ImportPage.jsx  ImportPage from Settings. "Download Import Template" 
+button: base64 decode → Blob → download (per TIP 
+§8.2). File picker accept=".xlsx". Pre -check: reject 
+>50MB before parse. Loading spinner during parse. On 
+parse complete → navigate to ImportReview with r esult.  
+Acceptance Criteria  
+185. "Download Import Template" downloads AllInBooks_ImportTemplate.xlsx  
+186. File picker accepts .xlsx only  
+187. >50MB rejected before parse  
+188. Loading spinner visible during parse  
+189. ImportReview appears after parse complete  
+ 
+T-7.4  ImportReview — validation table  
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: T-7.2 
+Parallel: YES — parallel with T -7.2 
+Files What to build  
+src/features/import/ImportReview.jsx  Summary at top: N valid (green), N warnings (orange), 
+N errors (red), N duplicates (grey). Scrollable table: 
+error rows red (expand for per -cell messages with rule 
+ID), warning rows orange (override checkbox), valid 
+rows green. Buttons: "Import N valid row s" and 
+"Cancel". Import calls ImportService.commit(validRows), 
+shows progress, navigates to ImportSummary.  
+Acceptance Criteria  
+190. Summary counters show correct counts  
+191. Error rows expand to show per -cell message with column name and rule ID  
+192. Warning override checkbox moves row to valid count  
+193. "Import N valid rows" shows correct count dynamically  
+194. Progress indicator visible during commit  
+195. Cancel returns to ImportPage with no DB writes  
+ 
+T-7.5  ImportSummary + 24 -hour undo  
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: T-7.2, T -7.4 
+Parallel: NO — depends on T -7.2 + T -7.4 
+Files What to build  
+src/features/import/ImportSummary.jsx  Three stat boxes: Imported (green), Skipped (grey), 
+Errors (red). "Undo Import" button: visible only when 
+import was <24h ago (compare Date.now() to 
+importBatch.importedAt). Confirmation modal: 
+"Remove all N imported entries?". On confirm: 
+ImportService.un do(batchId), toast "Import undone", 
+navigate to ImportPage. "Done" navigates to 
+Dashboard.  
+Acceptance Criteria  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 19 196. Correct counts matching commit() result  
+197. "Undo Import" visible immediately after import  
+198. "Undo Import" NOT visible when import is >24h old  
+199. Undo removes all imported rows from IndexedDB  
+200. After undo, entries gone from EntriesPage  
+201. "Done" navigates to Dashboard  
+ 
+ 
+⏸  CHECKPOINT 7 — End of Epic 7 — STOP. VERIFY BEFORE CONTINUING  
+Agent instruction: pause execution. Run all checks below. Do not open the next Epic until every item 
+passes. Fix failures before continuing.  
+202. Download template, verify all 5 sheets open in Google Sheets  
+203. Fill 20 rows including 2 error rows and 1 duplicate of an existing entry  
+204. Upload → ImportReview shows 17 valid, 2 errors, 1 duplicate with correct messages  
+205. Import → ImportSummary: Imported=17, Skipped=1, Errors=2  
+206. EntriesPage shows 17 imported entries with "Imported" badge  
+207. Undo → all 17 entries disappear from EntriesPage  
+  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 20 EPIC 8: PWA + Google Drive Backup + Onboarding + Polish  
+Sprint 8  •  7 tasks  •  ~14 –18hh estimated  
+  NOTE  DriveAuth (T -8.1) = Claude — security -sensitive OAuth. Everything else = Gemini. Exit gate: Lighthouse ≥ 90, 
+Android PWA install.  
+ 
+T-8.1  DriveAuth — Google OAuth 2.0 PKCE  
+Agent: Claude Sonnet 4.6   Effort: 3–4h   Depends: T-1.1 
+Parallel: YES — parallel with T -8.2 
+Files What to build  
+src/services/DriveAuth.js  Per TIP §10: connect() — generate PKCE verifier/challenge, redirect 
+to Google OAuth. handleCallback(code) — exchange for tokens, 
+store access_token+refresh_token+expiry in localStorage. getToken() 
+— return valid token, call _refresh() silently when expired . 
+isConnected() — checks for refresh_token. disconnect() — clears all 
+3 localStorage items. Scope: drive.file only. Redirect URI: 
+window.location.origin+"/auth/callback". Wire /auth/callback route to 
+call handleCallback(code).  
+Acceptance Criteria  
+208. connect() redirects with correct PKCE params and scope=drive.file  
+209. /auth/callback stores tokens in localStorage  
+210. getToken() returns valid token without redirect when not expired  
+211. getToken() silently refreshes when access token expired  
+212. isConnected() returns true only when refresh_token present  
+213. disconnect() clears all 3 localStorage items  
+214. Full flow works on Android Chrome with real Google account  
+⚠  Requires VITE_GOOGLE_CLIENT_ID in .env.local — see TIP §14.1 for Google Cloud setup.  
+T-8.2  BackupService + BackupSettings + useBackupSchedule  
+Agent: Gemini 3 Pro   Effort: 3–4h   Depends: T-6.5 
+Parallel: YES — parallel with T -8.1 
+Files What to build  
+src/services/BackupService.js  
+src/features/settings/BackupSettings.jsx  
+src/hooks/useBackupSchedule.js  BackupService.run(bookId): get token, get xlsx 
+buffer from ExportService, find/create "All in Books" 
+Drive folder, upload 
+AllInBooks_Backup_Week[N]_[YYYY].xlsx, prune 
+to keep 4 most recent. shouldRunToday(): true if 
+Sunday AND last backup >6 days ago 
+(loca lStorage "lastBackupAt"). 
+useBackupSchedule: on app open, run if 
+shouldRunToday(). BackupSettings UI: Connect 
+Drive, last backup timestamp, Backup Now, 
+Disconnect.  
+Acceptance Criteria  
+215. BackupService.run() uploads .xlsx to Google Drive  
+216. File appears in "All in Books" folder in Drive  
+217. After 5 runs, oldest file deleted (4 remain)  
+218. "Backup Now" triggers immediate backup  
+219. Last backup timestamp updates in Settings  
+ 
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 21 T-8.3  PWA — manifest, service worker, install prompt  
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: T-1.1 
+Parallel: YES — parallel with T -8.1 
+Files What to build  
+vite.config.js  
+public/manifest.json  
+src/hooks/usePWAInstall.js  Configure vite -plugin -pwa per TIP §7.1: manifest name="All in 
+Books", theme_color="#1B3A5C", display="standalone", 
+orientation="portrait". Service worker: Cache -First for all assets. 
+Drive API: Network -First with 10s timeout. Create 192x192 and 
+512x512 PNG  icons. usePWAInstall hook per TIP §7.2. Install 
+banner on Dashboard when canInstall=true.  
+Acceptance Criteria  
+220. Lighthouse PWA score ≥ 90  
+221. App installs on Android Chrome via address bar or install banner  
+222. Opens in standalone mode (no browser chrome)  
+223. Loads fully in DevTools → Network → Offline (airplane mode)  
+224. theme_color #1B3A5C visible in Android status bar when open  
+ 
+T-8.4  3-step onboarding flow  
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: T-1.4 
+Parallel: YES — parallel with T -8.3 
+Files What to build  
+src/features/onboarding/OnboardingFlow.jsx  Show once — check localStorage "onboarded". 
+Step 1: business name (required). Step 2: GST 
+registered? (Yes → GSTIN input / Skip). Step 3: 
+confirm + "Let's get started →". Save 
+businessName+gstin to books table 
+(bookId="main"). Set localStorage 
+"onboarded"= true. Navigate to Dashboard. 
+Cannot be skipped.  
+Acceptance Criteria  
+225. Appears as full -screen overlay on first launch only  
+226. Does not appear on subsequent launches  
+227. Business name required — cannot proceed without it  
+228. GSTIN field appears only when "Yes" selected  
+229. Data saved to IndexedDB books table  
+230. After completion, business name appears in Dashboard top bar  
+ 
+T-8.5  Settings page  
+Agent: Gemini 3 Pro   Effort: 2–3h   Depends: T-6.5, T -8.1 
+Parallel: YES — parallel with T -8.4 
+Files What to build  
+src/features/settings/SettingsPage.jsx  
+src/features/settings/InvoiceSettings.jsx  
+src/features/settings/CategorySettings.jsx  Sections: Business Details (name, logo upload, 
+GSTIN → books table), Invoice Settings (prefix, 
+default GST rate), Categories (add/delete non -
+default), Data & Backup (BackupSettings + 
+Export to Excel + Import Historical Data link), 
+About (app version from V ITE_APP_VERSION).  
+Acceptance Criteria  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 22 231. Business name edit saves and appears on invoices and dashboard  
+232. Invoice prefix change reflected in next invoice number  
+233. Custom category appears in EntryForm CategoryChips  
+234. Default categories cannot be deleted  
+235. "Export to Excel" downloads AllInBooks_Export file  
+236. "Import Historical Data" navigates to ImportPage  
+ 
+T-8.6  Polish — empty states, error boundaries, 320px final pass  
+Agent: Gemini 3 Pro   Effort: 1–2h   Depends: All prior tasks  
+Parallel: NO — final pass after all features done  
+Files What to build  
+src/components/EmptyState.jsx  
+All feature pages  EmptyState on every zero -data page: EntriesPage, PartiesPage, 
+InvoicesPage, ReportsPage, ImportPage. React error 
+boundaries around each major feature section. Verify all forms 
+scrollable at 320px with Android soft keyboard open. FAB not 
+hidden behind keybo ard. 
+Acceptance Criteria  
+237. Each zero -data page shows EmptyState with icon and CTA  
+238. Crash in one feature section does not crash Dashboard or EntryForm  
+239. All form fields accessible at 320px with soft keyboard open  
+240. FAB visible when soft keyboard open  
+241. No horizontal scroll at 320px on any screen  
+ 
+ 
+⏸  CHECKPOINT 8 — FINAL EXIT GATE — Phase 1 Complete — STOP. 
+VERIFY BEFORE CONTINUING  
+Agent instruction: pause execution. Run all checks below. Do not open the next Epic until every item 
+passes. Fix failures before continuing.  
+242. Lighthouse: PWA ≥ 90, Performance ≥ 80 on mobile simulation  
+243. App installs as PWA on real Android device or DevTools Android simulation  
+244. Full offline mode: all features work in airplane mode  
+245. Google Drive backup: "Backup Now" → file appears in Drive folder  
+246. Excel export: 7 sheets open in Google Sheets with correct data  
+247. Full import cycle: template → 50 rows → upload → review → confirm → verify → undo  
+248. Invoice cycle: create → PDF → share via Android share sheet  
+249. Onboarding flow in fresh incognito browser session  
+250. No horizontal scroll at 320px on any screen  
+  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 23 Appendix A — Agent Routing Quick Reference  
+Quick reference for Antigravity Manager View. Claude tasks ( ⚠) are the 8 tasks where correctness 
+outweighs token cost. Feed this table to the Manager to configure agent roles.  
+ 
+Task Description  Agent  Reason  
+T-1.1 Scaffold Vite + React project  Gemini 3 Pro  Boilerplate  
+T-1.2 Utility functions  Gemini 3 Pro  Formulaic  
+T-1.3 Dexie schema + seed  Gemini 3 Pro  Boilerplate  
+T-1.4 Zustand stores  Gemini 3 Pro  Pattern -based, no 
+complex logic  
+T-1.5 Shared UI components  Gemini 3 Pro  UI scaffolding  
+T-2.1 TypeSelector + CategoryChips  Gemini 3 Pro  Simple UI components  
+T-2.2 GSTFields — GST calc logic  Claude Sonnet 4.6  MATH -CRITICAL ⚠ 
+T-2.3 PartyField autocomplete  Gemini 3 Pro  Standard search UI  
+T-2.4 PhotoAttach + compression  Gemini 3 Pro  File I/O pattern  
+T-2.5 EntryForm assembly  Claude Sonnet 4.6  COMPLEX 
+INTEGRATION ⚠ 
+T-3.1 Entries list + detail  Gemini 3 Pro  Display component  
+T-3.2 Party list + form  Gemini 3 Pro  Display component  
+T-3.3 Party statement + PDF share  Gemini 3 Pro  Display + share API  
+T-3.4 Router + BottomNav  Gemini 3 Pro  Routing boilerplate  
+T-4.1–
+4.3 Dashboard (all)  Gemini 3 Pro  Display + Recharts  
+T-5.1 InvoicePreview (inline styles)  Claude Sonnet 4.6  PRINT LAYOUT 
+CRITICAL ⚠ 
+T-5.2 InvoicePDF service  Claude Sonnet 4.6  html2canvas integration 
+⚠ 
+T-5.3 InvoiceForm  Gemini 3 Pro  Form assembly  
+T-5.4 InvoiceList  Gemini 3 Pro  List component  
+T-6.1 PeriodPicker  Gemini 3 Pro  UI component  
+T-6.2 P&L Report  Claude Sonnet 4.6  AGGREGATION 
+CORRECTNESS ⚠ 
+T-6.3 GST Summary Report  Claude Sonnet 4.6  TAX CALCULATION ⚠ 
+T-6.4 Balance Sheet  Gemini 3 Pro  Simple aggregation 
+display  
+T-6.5 ExportService (SheetJS)  Gemini 3 Pro  SheetJS API calls  
+T-7.1 Import template script  Gemini 3 Pro  Build script, SheetJS  
+T-7.2 ImportService (full)  Claude Sonnet 4.6  VALIDATION LOGIC ⚠ 
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 24 Task Description  Agent  Reason  
+T-7.3 Import upload UI  Gemini 3 Pro  UI only  
+T-7.4 ImportReview screen  Gemini 3 Pro  Table display UI  
+T-7.5 ImportSummary + undo UI  Gemini 3 Pro  Summary display UI  
+T-8.1 DriveAuth OAuth PKCE  Claude Sonnet 4.6  SECURITY -SENSITIVE 
+⚠ 
+T-8.2 BackupService + settings  Gemini 3 Pro  Service orchestration  
+T-8.3 PWA config + install  Gemini 3 Pro  Vite plugin config  
+T-8.4 Onboarding flow  Gemini 3 Pro  Simple form flow  
+T-8.5 Settings page  Gemini 3 Pro  Settings UI  
+T-8.6 Polish + empty states  Gemini 3 Pro  Cleanup pass  
+ 
+Token Budget Guidance  
+• Gemini 3 Pro: All 27 Gemini -assigned tasks. Generous free limits. Do not use for security or math -
+critical work.  
+• Claude Sonnet 4.6: Only the 8 marked ⚠ tasks: GSTFields, EntryForm assembly, InvoicePreview, 
+InvoicePDF, P&L Report, GST Summary, ImportService, DriveAuth.  
+• Feed one Epic at a time. After each CHECKPOINT, close the agent session. Open a fresh one with 
+the next Epic as context + a brief "What was already built" summary.  
+  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 25 Appendix B — Pushing Epics & Tasks to GitHub Issues  
+Each Epic = one GitHub Milestone. Each task = one GitHub Issue with labels for priority, agent, type, and 
+parallelism. Blocking relationships are captured in issue body text and cross -referenced via comments 
+after creation. Uses the GitHub CLI (gh).  
+ 
+  NOTE  Install: brew install gh (macOS) or winget install GitHub.cli (Windows). Authenticate: gh auth login  
+ 
+B.1  Label and Milestone Setup (run once)  
+REPO="owner/all -in-books"   # < -- change this  
+ 
+# Priority labels  
+gh label create "P0 -critical"    --color "B02020" --description "MVP must -
+have"   --repo $REPO  
+gh label create "P1 -important"   --color "B85C00" --description "Pre -release"      
+--repo $REPO  
+gh label create "P2 -nice"        --color "1A7F4B" --description "Post -launch"       
+--repo $REPO  
+ 
+# Agent labels  
+gh label create "agent:claude"   --color "6B21A8" --description "Claude Sonnet 
+4.6" --repo $REPO  
+gh label create "agent:gemini"   --color "1565C0" --description "Gemini 3 Pro"       
+--repo $REPO  
+ 
+# Type labels  
+gh label create "type:feature"   --color "0E7C7B" --repo $REPO  
+gh label create "type:infra"     --color "374151" --repo $REPO  
+gh label create "type:service"   --color "5B2D8E" --repo $REPO  
+gh label create "type:ui"        --color "1A6FA8" --repo $REPO  
+gh label create "type:report"    --color "B85C00" --repo $REPO  
+gh label create "type:pwa"       --color "0D2137" --repo $REPO  
+ 
+# Parallelism labels  
+gh label create "parallel:yes"   --color "1A7F4B" --repo $REPO  
+gh label create "parallel:no"    --color "B02020" --repo $REPO  
+ 
+# Status labels  
+gh label create "status:checkpoint"  --color "7C3F00" --repo $REPO  
+gh label create "status:blocked"     --color "B02020" --repo $REPO  
+gh label create "status:in -progress" --color "B85C00" --repo $REPO  
+ 
+# Milestones (one per Epic)  
+for M in \ 
+  "Epic 1: Foundation" \ 
+  "Epic 2: Entry Form" \ 
+  "Epic 3: Entries + Parties" \ 
+  "Epic 4: Dashboard" \ 
+  "Epic 5: Invoices + PDF" \ 
+  "Epic 6: Reports + Export" \ 
+  "Epic 7: Import" \ 
+  "Epic 8: PWA + Backup + Polish"; do  
+  gh api repos/$REPO/milestones -f title="$M" 2>/dev/null  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 26 done 
+echo "Labels and milestones created."  
+ 
+B.2  Issue Creation Script (run once after B.1)  
+Save as scripts/create_github_issues.sh. Run: chmod +x scripts/create_github_issues.sh && 
+./scripts/create_github_issues.sh  
+Issue numbers are captured into shell variables ($T11, $T12, etc.) so blocking cross -references are wired 
+automatically at the end. The script creates all 43 issues (35 task + 8 checkpoint).  
+ 
+#!/usr/bin/env bash  
+# scripts/create_github_issues.sh  
+ 
+REPO="owner/all -in-books"   # < -- change this  
+ 
+# Helper: create issue → return issue number  
+mkissue() {  
+  # $1=title $2=body $3=labels $4=milestone  
+  gh issue create --repo "$REPO" \ 
+    --title "$1" --body "$2" --label "$3" --milestone "$4" \ 
+    2>/dev/null | grep -oP "(?<=issues/) \d+" 
+} 
+ 
+# ─── EPIC 1 ─────────────────────────────────────────────────────  
+echo "Creating Epic 1 issues..."  
+ 
+T11=$(mkissue "[T -1.1] Scaffold Vite+React+Tailwind+Vercel" \ 
+"## What to build Create Vite+React 18, install deps from TIP 9.2, Tailwind, 
+vercel.json SPA rewrite, full src/ from TIP 2.  ## Acceptance Criteria - [ ] 
+npm run dev works, no errors - [ ] npm run build succeeds - [ ] Vercel URL 
+live - [ ] Tailwind classes  render - [ ] All folders from TIP 2 exist  ## 
+Effort: 2 -3h | Agent: Gemini 3 Pro | Parallel: YES with T -1.2" \ 
+"P0-critical,agent:gemini,type:infra,parallel:yes" "Epic 1: Foundation")  
+echo "T-1.1 = #$T11"  
+ 
+T12=$(mkissue "[T -1.2] Utility functions: uuid, dates, currency, gst" \ 
+"## What to build Implement src/utils/ per TIP 6. formatINR(1234567) must 
+return Rs.12,34,567 (Indian lakh format). calcFromTotal(1180,18) must return 
+{base:1000,gst:180}.  ## Acceptance Criteria - [ ] formatINR uses Indian lakh 
+format - [ ] calcFromTotal( 1180,18) correct - [ ] today() returns YYYY -MM-DD  
+## Effort: 1 -2h | Agent: Gemini 3 Pro | Parallel: YES with T -1.1" \ 
+"P0-critical,agent:gemini,type:infra,parallel:yes" "Epic 1: Foundation")  
+echo "T-1.2 = #$T12"  
+ 
+T13=$(mkissue "[T -1.3] Dexie.js schema + seed categories" \ 
+"## What to build 8 tables with index strings per TIP 3. 10 default categories 
+seeded on first run.  ## Acceptance Criteria - [ ] IndexedDB AllInBooks with 8 
+tables - [ ] 10 seed categories on first launch - [ ] Seed runs once only  ## 
+Effort: 2 -3h | Agent : Gemini 3 Pro | Parallel: NO | Depends on: #$T11" \ 
+"P0-critical,agent:gemini,type:infra,parallel:no" "Epic 1: Foundation")  
+echo "T-1.3 = #$T13"  
+ 
+T14=$(mkissue "[T -1.4] All Zustand stores" \ 
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 27 "## What to build 6 stores per TIP 4. bookId=main always. Includes 
+getTodaySummary() in transactionStore.  ## Acceptance Criteria - [ ] 
+transactionStore.add() saves to IndexedDB - [ ] getTodaySummary() returns 
+correct totals - [ ] partyStore.search() filte rs correctly - [ ] 
+invoiceStore.getNextInvoiceNumber() = AIB -0001  ## Effort: 3 -4h | Agent: 
+Gemini 3 Pro | Parallel: YES | Depends on: #$T13" \ 
+"P0-critical,agent:gemini,type:infra,parallel:yes" "Epic 1: Foundation")  
+echo "T-1.4 = #$T14"  
+ 
+T15=$(mkissue "[T -1.5] Shared UI: Toast, Modal, Sheet, FAB, BottomNav, 
+StatusDot, EmptyState" \ 
+"## What to build 7 shared components per TIP 13 contracts. Toast auto -
+dismisses 2.5s. FAB always visible. StatusDot reacts to navigator.onLine.  ## 
+Acceptance Criteria - [ ] Toast auto -dismisses 2.5s - [ ] FAB always visible 
+above nav - [ ] StatusDot grey  offline - [ ] All 44px min touch target  ## 
+Effort: 2 -3h | Agent: Gemini 3 Pro | Parallel: YES | Depends on: #$T11" \ 
+"P0-critical,agent:gemini,type:ui,parallel:yes" "Epic 1: Foundation")  
+echo "T-1.5 = #$T15"  
+ 
+CP1=$(mkissue "CHECKPOINT 1 - Verify Epic 1" \ 
+"Gate checks - do not start Epic 2 until all pass: - [ ] App deploys to Vercel 
+- [ ] IndexedDB: 8 tables + 10 seed categories - [ ] formatINR(1234567) === 
+Rs.12,34,567 in console - [ ] All stores read/write IndexedDB - [ ] All 7 
+shared components render at  320px" \ 
+"status:checkpoint,P0 -critical" "Epic 1: Foundation")  
+echo "Checkpoint 1 = #$CP1"  
+ 
+# ─── EPIC 2 ─────────────────────────────────────────────────────  
+echo "Creating Epic 2 issues..."  
+ 
+T21=$(mkissue "[T -2.1] TypeSelector + CategoryChips" \ 
+"## What to build 5 -pill TypeSelector. CategoryChips: scrollable, filtered by 
+type, +Add.  ## Acceptance Criteria - [ ] All 5 pills fire onChange - [ ] 
+CategoryChips correct per type - [ ] +Add creates new category  ## Effort: 1 -
+2h | Agent: Gemini 3 Pro | Parallel: YES with T -2.2 | Depends on: #$T14 #$T15" 
+\ 
+"P0-critical,agent:gemini,type:ui,parallel:yes" "Epic 2: Entry Form")  
+ 
+T22=$(mkissue "[T -2.2] GSTFields - live GST calculation [CLAUDE ONLY]" \ 
+"## What to build GST toggle + rate chips (0/5/12/18/28%). calcFromTotal() 
+from gst.js. Emits (baseAmount,gstAmount,gstRate) or (null,null,null) when 
+off.  ## Acceptance Criteria - [ ] Rs.1180 @ 18% shows Base:Rs.1000 GST:Rs.180 
+- [ ] Rs.1000 @ 5% shows Base:Rs.952.38 GST:Rs.47.62 - [ ] Toggle off emits 
+(null,null,null) - [ ] Indian lakh formatting throughout - [ ] Rate chips 
+mutually exclusive  ## Effort: 2 -3h | Agent: Claude Sonn et 4.6 | Parallel: YES 
+| Depends on: #$T14" \ 
+"P0-critical,agent:claude,type:feature,parallel:yes" "Epic 2: Entry Form")  
+ 
+T23=$(mkissue "[T -2.3] PartyField - search-as-you-type with add -new" \ 
+"## What to build 200ms debounced search via partyStore.search(). Dropdown 
+with balance. Add -new option.  ## Acceptance Criteria - [ ] Shows matches 
+within 200ms - [ ] Balance shown per party - [ ] Add-new creates + selects 
+party - [ ] Clear fires onChange (null,null)  ## Effort: 2 -3h | Agent: Gemini 3 
+Pro | Parallel: YES | Depends on: #$T14" \ 
+"P0-critical,agent:gemini,type:ui,parallel:yes" "Epic 2: Entry Form")  
+ 
+T24=$(mkissue "[T -2.4] PhotoAttach - 50MB guard + compression" \ 
+"## What to build File input. >50MB blocked. Compress <400KB via canvas JPEG 
+0.7. Blob in attachments table. Thumbnail + lightbox.  ## Acceptance Criteria 
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 28 - [ ] <50MB stores compressed attachment - [ ] >50MB shows error, no 
+attachment - [ ] Stored blob <400KB - [ ] Thumbnail opens lightbox  ## Effort: 
+1-2h | Agent: Gemini 3 Pro | Parallel: YES | Depends on: #$T15" \ 
+"P0-critical,agent:gemini,type:feature,parallel:yes" "Epic 2: Entry Form")  
+ 
+T25=$(mkissue "[T -2.5] EntryForm assembly [CLAUDE ONLY]" \ 
+"## What to build Assemble all sub -components + amount input + date picker + 
+note. On Save: validate, transactionStore.add(), toast, close Sheet. GST 
+fields null when off.  ## Acceptance Criteria - [ ] FAB opens EntryForm in 
+Sheet - [ ] Rs.1180 GST 18% saves base=1000 gst=1 80 - [ ] Empty amount shows 
+validation, no DB write - [ ] Post -save: toast + Sheet close + store reload - 
+[ ] Numeric keypad on Android  ## Effort: 4 -5h | Agent: Claude Sonnet 4.6 | 
+Parallel: NO | Depends on: #$T21 #$T22 #$T23 #$T24" \ 
+"P0-critical,agent:claude,type:feature,parallel:no" "Epic 2: Entry Form")  
+ 
+CP2=$(mkissue "CHECKPOINT 2 - Verify Epic 2" \ 
+"- [ ] FAB opens EntryForm - [ ] Rs.1180 GST 18% -> base=1000 gst=180 in 
+IndexedDB - [ ] Photo -> thumbnail visible - [ ] Empty amount -> validation 
+error, no write - [ ] Renders at 320px" \ 
+"status:checkpoint,P0 -critical" "Epic 2: Entry Form")  
+ 
+# --- Epics 3-8 follow the same pattern.  
+# Copy the task descriptions from the TTB task cards above.  
+# Variable naming: T31..T34, CP3, T41..T43, CP4,  
+#   T51..T54, CP5, T61..T65, CP6, T71..T75, CP7, T81..T86, CP8  
+ 
+# ─── WIRE BLOCKING CROSS -REFERENCES ─────────────────────────────  
+echo "Wiring blocking cross -references..."  
+ 
+# These commands run after all issues are created.  
+# Replace variable names with actual issue numbers if running manually.  
+gh issue comment $T13 --repo $REPO --body "Blocked by: #$T11"  
+gh issue comment $T14 --repo $REPO --body "Blocked by: #$T13"  
+gh issue comment $T15 --repo $REPO --body "Blocked by: #$T11"  
+gh issue comment $T25 --repo $REPO --body "Blocked by: #$T21 #$T22 #$T23 
+#$T24"  
+gh issue comment $T31 --repo $REPO --body "Blocked by: #$T25"  
+gh issue comment $T34 --repo $REPO --body "Blocked by: #$T31 #$T32"  
+gh issue comment $T43 --repo $REPO --body "Blocked by: #$T41 #$T42"  
+gh issue comment $T52 --repo $REPO --body "Blocked by: #$T51"  
+gh issue comment $T65 --repo $REPO --body "Blocked by: #$T13 #$T14"  
+gh issue comment $T72 --repo $REPO --body "Blocked by: #$T71 #$T13"  
+gh issue comment $T75 --repo $REPO --body "Blocked by: #$T72 #$T74"  
+gh issue comment $T82 --repo $REPO --body "Blocked by: #$T65"  
+gh issue comment $T85 --repo $REPO --body "Blocked by: #$T65 #$T81"  
+ 
+echo ""  
+echo "Done. https://github.com/$REPO/issues"  
+ 
+B.3  GitHub Project Board Setup  
+Create a GitHub Project (Projects v2) with 5 columns: Backlog → Up Next → In Progress → 
+Review/Checkpoint → Done. In Antigravity Manager View, agents pick from Up Next. On task complete, 
+move to Review/Checkpoint. The checkpoint issue stays there until all  boxes are manually verified, then 
+move the whole Epic to Done.  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 29  
+Label  How to use in Antigravity Manager View  
+agent:gemini  Filter this label → Gemini task queue. Assign all to a Gemini 3 Pro agent.  
+agent:claude  Filter this label → Claude task queue. These 8 tasks use Claude credits.  
+parallel:yes  Within an Epic, spawn parallel:yes tasks as concurrent agents in Manager View.  
+parallel:no  Wait for all blocking issues to close before starting these tasks.  
+status:checkpoint  Hard gate. No new tasks in next Epic until all checkboxes verified.  
+status:blocked  Apply when depends -on issue is still open. Remove when blocker closes.  
+  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 30 Appendix C — Frontend Design Skill for All in Books  
+This appendix is a project -specific design skill document. Feed it to any agent (Gemini or Claude) when 
+building UI components for All in Books. It translates the generic frontend -design skill into concrete, 
+opinionated decisions for this app.  
+ 
+C.1  Aesthetic Direction — "Premium Ledger"  
+All in Books should feel like a premium physical ledger reimagined as a native Android app. The aesthetic 
+is refined and utilitarian — not playful, not generic SaaS blue -white, not material design defaults. Think: 
+quality stationery, clean ink on cream pap er, confident numbers. The single unforgettable thing: every 
+number is perfectly formatted and colour -coded green/red with absolute precision.  
+ 
+C.2  Colour System  
+Role Hex Usage  
+Primary / Navy  #0D2137  App shell, headers, FAB, invoice TOTAL banner  
+Accent / Blue  #1A6FA8  Links, active tabs, h2 borders, primary buttons, invoice INVOICE 
+title 
+Money IN / Green  #1A7F4B  Sale amounts, receipt amounts, To Receive balances, positive 
+net, income bars in chart  
+Money OUT / Red  #B02020  Purchase/expense amounts, To Pay balances, negative net, 
+expense bars, P0 labels  
+Warning / Amber  #B85C00  Pending status, warning toasts, overridable import rows, P1 
+labels  
+Background  #FFFFFF  Main page background  
+Card Background  #EBF5FB  Info boxes, form sections, persona cards, light tint for alternating 
+table rows  
+Alt Row  #F5F9FD  Alternating table rows, data tables, invoice line item zebra  
+Border  #B8D0E8  All table borders, card borders, input borders  
+Text Primary  #111827  All body text, amounts, entry descriptions  
+Text Secondary  #374151  Labels, hints, sub -values  
+Text Tertiary  #6B7280  Timestamps, empty state text, header/footer text  
+ 
+C.3  Typography  
+Element  Font / Size / Weight  Notes  
+App name / 
+Headings  DM Serif Display, 20 –
+32px, 400  Gives an editorial, quality -ledger feel. Import from 
+Google Fonts.  
+Body text / Labels  DM Sans, 14 –16px, 
+400–500 Clean, designed for data -dense interfaces. Pairs 
+well with DM Serif.  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 31 Element  Font / Size / Weight  Notes  
+Amounts / Numbers  DM Mono, 14 –18px, 
+500–600 Monospace numbers for perfect column alignment 
+in ledger views.  
+Type badges (SALE 
+etc) DM Sans, 11px, 700, 
+ALL CAPS  Small, punchy, letter -spacing: 0.05em  
+Toast messages  DM Sans, 14px, 500  Readable at a glance  
+Google Fonts import (add to index.html):  
+<link rel="preconnect" href="https://fonts.googleapis.com">  
+<link href="https://fonts.googleapis.com/css2?  
+  family=DM+Mono:ital,wght@0,400;0,500;0,600;1,400&  
+  
+family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&  
+  family=DM+Serif+Display:ital@0;1&  
+  display=swap" rel="stylesheet">  
+ 
+C.4  Component Design Patterns  
+Amount Display  
+All monetary amounts use DM Mono. Positive amounts (income types) always use green (#1A7F4B). 
+Negative amounts (expense types) always use red (#B02020). Never use black for amounts. Large 
+dashboard amounts (Net Today, Total IN/OUT) should be 28 –32px. Ledge r amounts should be 14 –15px.  
+Entry Type Badges  
+Small pill badges. Text: 11px, DM Sans 700, ALL CAPS, letter -spacing: 0.05em. Background: 10% 
+opacity of the type colour. Border: 1px solid at 30% opacity. Types: SALE=green, RECEIPT=green, 
+PURCHASE=red, EXPENSE=red, PAYMENT=amber.  
+Cards and Sections  
+Cards: white background, 1px border (#B8D0E8), border -radius: 12px, box -shadow: 0 1px 4px 
+rgba(13,33,55,0.08). No dark card backgrounds in the main UI — reserve navy for headers and banners. 
+Generous internal padding: 16px on mobile.  
+Input Fields  
+Border: 1px solid #B8D0E8. Border -radius: 8px. Focus border: 2px solid #1A6FA8. Background: white. 
+Padding: 12px 14px. Font: DM Sans 14px. The amount input should be larger: 28 –32px DM Mono, with a 
+₹ prefix in grey (#6B7280).  
+Bottom Sheet  
+White background, border -radius 16px top -left and top -right only, box -shadow: 0 -4px 24px 
+rgba(13,33,55,0.12). Handle bar at top: 32px wide, 4px tall, rounded, background #B8D0E8. Enters from 
+bottom with translateY transition: 0.28s cubic -bezier(0.32,0.72, 0,1). 
+FAB  
+Background: #0D2137 (navy). Color: white. Border -radius: 50%. Size: 56px. Box -shadow: 0 4px 16px 
+rgba(13,33,55,0.32). On hover/active: background shifts to #1B3A5C. Icon: Lucide "Plus", 24px. Position: 
+fixed, bottom: 80px (above BottomNav), right: 20px.  
+Toast  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 32 Border -radius: 10px. Max -width: 90vw. Padding: 12px 18px. Font: DM Sans 14px 500. Colours: success 
+background #ECFDF5, border left 4px #1A7F4B, text #065F46. Error: background #FEF2F2, border 
+#B02020, text #7F1D1D. Warning: background #FFFBEB, border #B85C 00, text #78350F. Position: 
+bottom -centre, above BottomNav, z -index: 9999.  
+ 
+C.5  Motion and Micro -interactions  
+Use CSS transitions for all state changes. No JS animation libraries needed.  
+/* Core transition variables — add to :root in index.css */  
+:root {  
+  --t-fast:  0.12s ease;  
+  --t-mid:   0.22s ease;  
+  --t-sheet: 0.28s cubic -bezier(0.32, 0.72, 0, 1);  
+} 
+ 
+/* Sheet entrance */  
+.sheet { transform: translateY(100%); transition: transform var( --t-sheet); }  
+.sheet.open { transform: translateY(0); }  
+ 
+/* Amount change flash — brief green/red tint */  
+.amount-updated { animation: amountFlash 0.4s ease; }  
+@keyframes amountFlash {  
+  0%   { background -color: transparent; }  
+  30%  { background -color: rgba(26,127,75,0.12); }  
+  100% { background -color: transparent; }  
+} 
+ 
+/* Toast entrance */  
+.toast { animation: toastIn 0.22s ease forwards; }  
+@keyframes toastIn {  
+  from { opacity: 0; transform: translateY(12px); }  
+  to   { opacity: 1; transform: translateY(0); }  
+} 
+ 
+/* Tab active indicator */  
+.nav-tab.active { color: #0D2137; }  
+.nav-tab.active::after { content: ""; display:block; height:2px;  
+  background:#1A6FA8; border -radius:2px; margin -top:2px; }  
+ 
+/* FAB press */  
+.fab:active { transform: scale(0.93); transition: transform var( --t-fast); }  
+ 
+C.6  Mobile -First Layout Constraints  
+• Minimum supported width: 320px (iPhone SE). Test every component at this width.  
+• BottomNav height: 64px. All content must have padding -bottom: 72px to clear the nav.  
+• FAB position: bottom: 80px, right: 20px (clears BottomNav + 16px gap).  
+• Touch targets: minimum 44×44px for all interactive elements (WCAG 2.1 AA).  
+• Safe area insets: use env(safe -area-inset -*) for iPhone notch compatibility.  
+• Font sizes: minimum 14px for readable body text; 11px only for type badges.  
+• Scrollable horizontal chip rows: use flex, overflow -x: auto, scrollbar -width: none.  
+All in Books  •  Technical Task Breakdown  •  Antigravity IDE  •  v1.0  •  March 2026  
+© All in Books 2026  •  Confidential  Page 33  
+C.7  Antigravity Agent Instructions  
+When feeding a UI task to an agent in Antigravity, prepend this to the prompt:  
+ 
+Prepend to every UI task prompt in Antigravity:  
+You are building a component for All in Books, a premium accounting PWA for Android India users. 
+Follow these design rules exactly:  
+1. Fonts: DM Serif Display for headings/app name, DM Sans for body/labels, DM Mono for all numbers 
+and amounts.  
+2. Colours: Navy #0D2137 primary, Blue #1A6FA8 accent, Green #1A7F4B for money in, Red #B02020 
+for money out, Amber #B85C00 for warnings.  
+3. Never use black for monetary amounts. Always green for income types, red for expense types.  
+4. All amounts use formatINR() from src/utils/currency.js — Indian lakh format (₹12,34,567 not 
+₹1,234,567).  
+5. Cards: white bg, 1px #B8D0E8 border, 12px radius, soft shadow. No dark card backgrounds.  
+6. All touch targets min 44px. Bottom nav is 64px tall — content needs padding -bottom: 72px.  
+7. Test at 320px width. No horizontal scroll. No inter -UI inconsistencies.  
+ 
+ 
