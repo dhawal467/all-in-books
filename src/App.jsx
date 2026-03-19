@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { Settings } from 'lucide-react';
 import { useUiStore } from './stores/uiStore';
 import Toast from './components/Toast';
 import Modal from './components/Modal';
@@ -25,7 +26,12 @@ function App() {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 h-14 bg-primary text-white flex items-center justify-between px-4 z-20 shadow-sm">
         <h1 className="font-serif text-xl tracking-wide m-0">All in Books</h1>
-        <StatusDot />
+        <div className="flex items-center gap-3">
+          <StatusDot />
+          <button className="p-1 active:scale-95 transition-transform" aria-label="Settings">
+            <Settings size={20} className="text-white/90" />
+          </button>
+        </div>
       </header>
 
       {/* Main Content Area */}
