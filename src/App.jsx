@@ -14,7 +14,7 @@ import EntryDetail from './features/entries/EntryDetail';
 import PartiesPage from './features/parties/PartiesPage';
 import PartyForm from './features/parties/PartyForm';
 import PartyStatement from './features/parties/PartyStatement';
-import { FileText } from 'lucide-react';
+import Dashboard from './features/dashboard/Dashboard';
 
 function App() {
   const { showToast, openModal } = useUiStore();
@@ -31,11 +31,7 @@ function App() {
       {/* Main Content Area */}
       <main className="pt-16 px-4 max-w-md mx-auto w-full">
         <Routes>
-          <Route path="/" element={
-            <div className="flex items-center justify-center h-[60vh]">
-              <p className="text-gray-400">Dashboard (T-4.1 stub)</p>
-            </div>
-          } />
+          <Route path="/" element={<Dashboard />} />
           
           <Route path="/entries" element={<EntriesPage />} />
           
