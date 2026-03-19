@@ -1,0 +1,81 @@
+﻿[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 1761 modules transformed.
+node.exe : [31mx[39m 
+Build failed in 2.62s
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo       
+       : NotSpecified:   
+  ([31mx[39m Build f   
+ ailed in 2.62s:Strin    
+g) [], RemoteExcepti    
+on
+    + FullyQualifiedErro 
+   rId : NativeCommandE  
+  rror
+ 
+[31merror during build:
+[31msrc/services/Invoice
+PDF.js (52:8): 
+Expression expected[31m
+file: [36mC:/Users/dhawa
+/OneDrive/Documents/All 
+in books/src/services/Inv
+oicePDF.js:52:8[31m
+[33m
+50:     await new 
+Promise((resolve) => {
+51:       root.render(
+52:         
+<InvoicePreview
+            ^
+53:           
+invoice={invoiceData}
+54:           
+business={business}
+[31m
+    at getRollupError (fi
+le:///C:/Users/dhawa/OneD
+rive/Documents/All%20in%2
+0books/node_modules/rollu
+p/dist/es/shared/parseAst
+.js:402:41)
+    at 
+ParseError.initialise (fi
+le:///C:/Users/dhawa/OneD
+rive/Documents/All%20in%2
+0books/node_modules/rollu
+p/dist/es/shared/node-ent
+ry.js:14465:28)
+    at convertNode (file:
+///C:/Users/dhawa/OneDriv
+e/Documents/All%20in%20bo
+oks/node_modules/rollup/d
+ist/es/shared/node-entry.
+js:16437:10)
+    at convertProgram (fi
+le:///C:/Users/dhawa/OneD
+rive/Documents/All%20in%2
+0books/node_modules/rollu
+p/dist/es/shared/node-ent
+ry.js:15677:12)
+    at Module.setSource (
+file:///C:/Users/dhawa/On
+eDrive/Documents/All%20in
+%20books/node_modules/rol
+lup/dist/es/shared/node-e
+ntry.js:17392:24)
+    at async ModuleLoader
+.addModuleSource (file://
+/C:/Users/dhawa/OneDrive/
+Documents/All%20in%20book
+s/node_modules/rollup/dis
+t/es/shared/node-entry.js
+:21497:13)[39m

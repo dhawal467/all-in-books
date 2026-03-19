@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, List, Users, MoreHorizontal } from 'lucide-react';
+import { Home, List, Users, FileText } from 'lucide-react';
 
 export default function BottomNav() {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ export default function BottomNav() {
     { path: '/entries', label: 'Entries', icon: List },
     { id: 'fab-spacer', label: '', isSpacer: true },
     { path: '/parties', label: 'Parties', icon: Users },
-    { path: '/more', label: 'More', icon: MoreHorizontal },
+    { path: '/invoices', label: 'Invoices', icon: FileText },
   ];
 
   return (

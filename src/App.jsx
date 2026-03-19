@@ -14,8 +14,9 @@ import EntriesPage from './features/entries/EntriesPage';
 import EntryDetail from './features/entries/EntryDetail';
 import PartiesPage from './features/parties/PartiesPage';
 import PartyForm from './features/parties/PartyForm';
-import PartyStatement from './features/parties/PartyStatement';
 import Dashboard from './features/dashboard/Dashboard';
+import InvoicesPage from './features/invoices/InvoicesPage';
+import InvoiceForm from './features/invoices/InvoiceForm';
 
 function App() {
   const { showToast, openModal } = useUiStore();
@@ -43,11 +44,7 @@ function App() {
           
           <Route path="/parties" element={<PartiesPage />} />
           
-          <Route path="/more" element={
-            <div className="flex items-center justify-center h-[60vh]">
-              <p className="text-gray-400">More (Stub)</p>
-            </div>
-          } />
+          <Route path="/invoices" element={<InvoicesPage />} />
 
           <Route path="/auth/callback" element={() => null} />
         </Routes>
@@ -101,8 +98,13 @@ function App() {
         {() => <PartyStatement />}
       </Sheet>
 
+      {/* Invoice Form Sheet */}
+      <Sheet name="invoiceForm" title="New Invoice">
+        {() => <InvoiceForm />}
+      </Sheet>
+
       {/* Navigation */}
-      {location.pathname !== '/parties' && <FAB onClick={() => openModal('entryForm')} />}
+      {location.pathname !== '/parties' && location.pathname !== '/invoices' && <FAB onClick={() => openModal('entryForm')} />}
       <BottomNav />
     </div>
   );
