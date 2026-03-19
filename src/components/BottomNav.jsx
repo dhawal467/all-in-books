@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, List, Users, FileText } from 'lucide-react';
+import { Home, List, Users, FileText, BarChart2 } from 'lucide-react';
 
 export default function BottomNav() {
   const navigate = useNavigate();
@@ -12,6 +12,7 @@ export default function BottomNav() {
     { id: 'fab-spacer', label: '', isSpacer: true },
     { path: '/parties', label: 'Parties', icon: Users },
     { path: '/invoices', label: 'Invoices', icon: FileText },
+    { path: '/reports', label: 'Reports', icon: BarChart2 },
   ];
 
   return (
