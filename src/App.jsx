@@ -18,6 +18,7 @@ import Dashboard from './features/dashboard/Dashboard';
 import InvoicesPage from './features/invoices/InvoicesPage';
 import InvoiceForm from './features/invoices/InvoiceForm';
 import ReportsPage from './features/reports/ReportsPage';
+import ImportPage from './features/import/ImportPage';
 
 function App() {
   const { showToast, openModal } = useUiStore();
@@ -48,6 +49,8 @@ function App() {
           <Route path="/invoices" element={<InvoicesPage />} />
 
           <Route path="/reports" element={<ReportsPage />} />
+
+          <Route path="/import" element={<ImportPage />} />
 
           <Route path="/auth/callback" element={() => null} />
         </Routes>
@@ -107,7 +110,7 @@ function App() {
       </Sheet>
 
       {/* Navigation */}
-      {location.pathname !== '/parties' && location.pathname !== '/invoices' && location.pathname !== '/reports' && <FAB onClick={() => openModal('entryForm')} />}
+      {location.pathname !== '/parties' && location.pathname !== '/invoices' && location.pathname !== '/reports' && location.pathname !== '/import' && <FAB onClick={() => openModal('entryForm')} />}
       <BottomNav />
     </div>
   );
