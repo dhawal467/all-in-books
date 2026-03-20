@@ -21,20 +21,36 @@ import InvoiceForm from './features/invoices/InvoiceForm';
 import ReportsPage from './features/reports/ReportsPage';
 import ImportPage from './features/import/ImportPage';
 import SettingsPage from './features/settings/SettingsPage';
+import MorePage from './features/more/MorePage';
 import ErrorBoundary from './components/ErrorBoundary';
 import OnboardingFlow from './features/onboarding/OnboardingFlow';
 import { useBackupSchedule } from './hooks/useBackupSchedule';
 
 /**
  * Handles the Google OAuth 2.0 callback redirect.
- * Extracts `code` from the URL, exchanges it for tokens via DriveAuth,
- * then redirects the user to the Settings page.
+ * Validates the CSRF `state` parameter before exchanging the code for tokens.
+ * Redirects to /?error=auth_failed if state is missing or mismatched.
  */
 function AuthCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get('code');
+    const params        = new URLSearchParams(window.location.search);
+    const code          = params.get('code');
+    const returnedState = params.get('state');
+    const storedState   = sessionStorage.getItem('oauth_state');
+
+    // V-005 CSRF fix: validate state before doing anything with the code
+    if (!returnedState || !storedState || returnedState !== storedState) {
+      console.error('DriveAuth: OAuth state mismatch — possible CSRF attack. Aborting.');
+      sessionStorage.removeItem('oauth_state');
+      navigate('/?error=auth_failed', { replace: true });
+      return;
+    }
+
+    // State validated — consume it immediately (one-time use)
+    sessionStorage.removeItem('oauth_state');
+
     if (code) {
       DriveAuth.handleCallback(code)
         .then(() => navigate('/settings', { replace: true }))
@@ -54,6 +70,7 @@ function AuthCallback() {
     </div>
   );
 }
+
 
 function App() {
   const { showToast, openModal } = useUiStore();
@@ -101,6 +118,8 @@ function App() {
           <Route path="/reports" element={<ReportsPage />} />
 
           <Route path="/import" element={<ImportPage />} />
+
+          <Route path="/more" element={<MorePage />} />
 
           <Route path="/settings" element={<SettingsPage />} />
 
