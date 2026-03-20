@@ -19,6 +19,7 @@ import Dashboard from './features/dashboard/Dashboard';
 import InvoicesPage from './features/invoices/InvoicesPage';
 import InvoiceForm from './features/invoices/InvoiceForm';
 import ReportsPage from './features/reports/ReportsPage';
+import ImportPage from './features/import/ImportPage';
 import SettingsPage from './features/settings/SettingsPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import OnboardingFlow from './features/onboarding/OnboardingFlow';
