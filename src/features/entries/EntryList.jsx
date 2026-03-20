@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import EntryRow from './EntryRow';
 import EmptyState from '../../components/EmptyState';
 import { FileText } from 'lucide-react';
+import { useUiStore } from '../../stores/uiStore';
 
 export default function EntryList({ transactions, loading }) {
   const grouped = useMemo(() => {
@@ -24,7 +25,9 @@ export default function EntryList({ transactions, loading }) {
         <EmptyState 
           icon={FileText} 
           title="No entries found" 
-          message="Change the filters or add a new entry." 
+          message="Change the filters or add a new entry to get started." 
+          ctaText="Add Entry"
+          onCtaClick={() => useUiStore.getState().openModal('entryForm')}
         />
       </div>
     );

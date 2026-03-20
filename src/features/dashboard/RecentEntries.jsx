@@ -5,7 +5,8 @@ import { usePartyStore } from '../../stores/partyStore';
 import { useCategoryStore } from '../../stores/categoryStore';
 import { useUiStore } from '../../stores/uiStore';
 import { formatINR } from '../../utils/currency';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Activity } from 'lucide-react';
+import EmptyState from '../../components/EmptyState';
 
 const TYPE_LABELS = {
   sale: 'Sale',
@@ -52,7 +53,19 @@ export default function RecentEntries() {
       .slice(0, 5);
   }, [transactions]);
 
-  if (recent.length === 0) return null;
+  if (recent.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6 p-4">
+        <EmptyState 
+          icon={Activity} 
+          title="No recent activity" 
+          message="Record a sale, purchase, or expense to see it here." 
+          ctaText="Add Entry"
+          onCtaClick={() => openModal('entryForm')}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6">

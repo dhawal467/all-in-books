@@ -8,6 +8,7 @@ import InvoiceList from './InvoiceList';
 import InvoicePreview from './InvoicePreview';
 import { shareInvoice } from '../../services/InvoicePDF';
 import Sheet from '../../components/Sheet';
+import EmptyState from '../../components/EmptyState';
 
 export default function InvoicesPage() {
   const { invoices, load: loadInvoices } = useInvoiceStore();
@@ -22,7 +23,19 @@ export default function InvoicesPage() {
   return (
     <div className="flex flex-col h-full bg-gray-50 pb-[100px] relative">
       <div className="flex-1 p-4 space-y-6 overflow-y-auto">
-        <InvoiceList invoices={invoices} loading={false} />
+        {invoices.length === 0 ? (
+          <div className="mt-8">
+            <EmptyState 
+              icon={FileText} 
+              title="No invoices yet" 
+              message="Create your first professional invoice to send to clients." 
+              ctaText="Create Invoice"
+              onCtaClick={() => openModal('invoiceForm')}
+            />
+          </div>
+        ) : (
+          <InvoiceList invoices={invoices} loading={false} />
+        )}
       </div>
 
       {/* Floating Action Button for New Invoice */}
