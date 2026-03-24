@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tax Invoice - ARK ENTERPRISES</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Work Sans', 'sans-serif'],
+          },
+          colors: {
+            ledger: '#1A1A1A',
+          },
+        },
+      },
+    }
+  </script>
+<style data-purpose="document-layout">
+    /* A4 Paper Dimensions and Print Styles */
+    body {
+      background-color: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      padding: 2rem 0;
+      font-family: 'Work Sans', sans-serif;
+    }
+    .a4-container {
+      width: 210mm;
+      min-height: 297mm;
+      background: white;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      padding: 10mm;
+      box-sizing: border-box;
+      color: #1A1A1A;
+    }
+    @media print {
+      body {
+        background: none;
+        padding: 0;
+      }
+      .a4-container {
+        box-shadow: none;
+        margin: 0;
+      }
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #1A1A1A;
+      padding: 4px 6px;
+      font-size: 11px;
+      line-height: 1.2;
+    }
+    .text-xxs {
+      font-size: 9px;
+    }
+  </style>
+</head>
+<body>
+<!-- BEGIN: Invoice Container -->
+<div class="a4-container border border-gray-200">
+<!-- BEGIN: Header Section -->
+<header class="border-t border-l border-r border-ledger text-center py-2">
+<h1 class="text-xl font-bold uppercase tracking-tight">ARK ENTERPRISES</h1>
+<p class="text-xs font-semibold">PLOT NO- 96 Shyam Vihar Colony, Heerapura 200ft Bypass,</p>
+<p class="text-xs font-semibold">Ajmer Road Jaipur Rajasthan 302019</p>
+<p class="text-xs font-semibold">Tel: 8306305272</p>
+<p class="text-xs font-bold">GSTIN: 08CNLPP2785B1ZQ</p>
+<div class="absolute right-[12mm] top-[14mm] text-xxs font-bold italic">Original for Recipient</div>
+</header>
+<!-- END: Header Section -->
+<!-- BEGIN: Invoice Title -->
+<div class="border border-ledger text-center py-1 bg-white">
+<h2 class="text-2xl font-black uppercase tracking-widest">Tax Invoice</h2>
+</div>
+<!-- END: Invoice Title -->
+<!-- BEGIN: Invoice Meta Data -->
+<div class="grid grid-cols-2">
+<div class="border-l border-b border-ledger">
+<div class="grid grid-cols-1 divide-y divide-ledger">
+<div class="p-1 px-2 font-bold text-xs flex justify-between">
+<span>Invoice No: 103</span>
+</div>
+<div class="p-1 px-2 font-bold text-xs">
+          Invoice date: 14/02/2026
+        </div>
+<div class="p-1 px-2 text-xs flex">
+<span class="flex-grow">.</span>
+<span class="border-l border-ledger px-4 font-bold">Code</span>
+<span class="border-l border-ledger px-4 font-bold">08</span>
+</div>
+</div>
+</div>
+<div class="border-l border-r border-b border-ledger">
+<div class="grid grid-cols-1 divide-y divide-ledger">
+<div class="p-1 px-2 font-bold text-xs">Transport Mode: Road</div>
+<div class="p-1 px-2 font-bold text-xs">Vehicle No.:</div>
+<div class="p-1 px-2 font-bold text-xs">E-Way Bill No.:</div>
+</div>
+</div>
+</div>
+<!-- END: Invoice Meta Data -->
+<!-- BEGIN: Billing and Shipping Party -->
+<div class="grid grid-cols-2">
+<!-- Bill to -->
+<div class="border-l border-b border-ledger">
+<div class="bg-gray-50 border-b border-ledger text-center font-bold text-xs py-1">Bill to Party</div>
+<div class="p-2 space-y-1">
+<p class="text-xs font-bold">Name: LAXMI INDUSTRIES</p>
+<p class="text-xs">Address: B-118 Sunder Nagar, 200 ft bypass Ajmer Road Jaipur 302019</p>
+<p class="text-xs font-bold">GSTIN: 08ALIPP1384P1ZD</p>
+</div>
+<div class="border-t border-ledger flex text-xs">
+<span class="flex-grow px-2 py-1">.</span>
+<span class="border-l border-ledger px-4 py-1 font-bold">Code</span>
+<span class="border-l border-ledger px-4 py-1 font-bold">08</span>
+</div>
+</div>
+<!-- Ship to -->
+<div class="border-l border-r border-b border-ledger">
+<div class="bg-gray-50 border-b border-ledger text-center font-bold text-xs py-1">Ship to Party (if applicable)</div>
+<div class="p-2 space-y-1">
+<p class="text-xs font-bold">Name: LAXMI INDUSTRIES</p>
+<p class="text-xs">Address: B-118 Sunder Nagar, 200 ft bypass Ajmer Road Jaipur 302019</p>
+<p class="text-xs font-bold">GSTIN: 08ALIPP1384P1ZD</p>
+</div>
+<div class="border-t border-ledger flex text-xs">
+<span class="flex-grow px-2 py-1">.</span>
+<span class="border-l border-ledger px-4 py-1 font-bold">Code</span>
+<span class="border-l border-ledger px-4 py-1 font-bold">08</span>
+</div>
+</div>
+</div>
+<!-- END: Billing and Shipping Party -->
+<!-- BEGIN: Main Items Table -->
+<div class="w-full">
+<table>
+<thead>
+<tr class="bg-gray-50 text-center font-bold">
+<th class="w-8" rowspan="2">S. No.</th>
+<th class="w-48" rowspan="2">Product Description</th>
+<th rowspan="2">HSN code</th>
+<th rowspan="2">UOM</th>
+<th rowspan="2">Qty</th>
+<th rowspan="2">Rate</th>
+<th rowspan="2">Amount</th>
+<th rowspan="2">Discount</th>
+<th rowspan="2">Taxable Value</th>
+<th colspan="2">CGST</th>
+<th colspan="2">SGST</th>
+<th class="w-16" rowspan="2">Total</th>
+</tr>
+<tr class="bg-gray-50 text-center font-bold">
+<th class="w-8">Rate</th>
+<th class="w-12">Amount</th>
+<th class="w-8">Rate</th>
+<th class="w-12">Amount</th>
+</tr>
+</thead>
+<tbody>
+<!-- Line Item 1 -->
+<tr>
+<td class="text-center">1</td>
+<td class="text-left py-4">Upholstery Fabric<br/>Amana 201</td>
+<td class="text-center">60019200</td>
+<td class="text-center">Mtr</td>
+<td class="text-right">2.5</td>
+<td class="text-right">350</td>
+<td class="text-right">875.00</td>
+<td class="text-right">0</td>
+<td class="text-right">875.00</td>
+<td class="text-right">2.50</td>
+<td class="text-right">21.88</td>
+<td class="text-right">2.50</td>
+<td class="text-right">21.88</td>
+<td class="text-right font-bold">919</td>
+</tr>
+<!-- Line Item 2 -->
+<tr>
+<td class="text-center">2</td>
+<td class="text-left py-4">Upholstery Fabric<br/>Punch 2</td>
+<td class="text-center">60019200</td>
+<td class="text-center">Mtr</td>
+<td class="text-right">2.5</td>
+<td class="text-right">350</td>
+<td class="text-right">875.00</td>
+<td class="text-right">0</td>
+<td class="text-right">875.00</td>
+<td class="text-right">2.50</td>
+<td class="text-right">21.88</td>
+<td class="text-right">2.50</td>
+<td class="text-right">21.88</td>
+<td class="text-right font-bold">919</td>
+</tr>
+<!-- Line Item 3 -->
+<tr>
+<td class="text-center">3</td>
+<td class="text-left py-4">Upholstery Fabric<br/>Stone 363</td>
+<td class="text-center">60019200</td>
+<td class="text-center">Mtr</td>
+<td class="text-right">10</td>
+<td class="text-right">400</td>
+<td class="text-right">4000.00</td>
+<td class="text-right">0</td>
+<td class="text-right">4000.00</td>
+<td class="text-right">2.50</td>
+<td class="text-right">100.00</td>
+<td class="text-right">2.50</td>
+<td class="text-right">100.00</td>
+<td class="text-right font-bold">4200</td>
+</tr>
+<!-- Line Item 4 -->
+<tr>
+<td class="text-center">4</td>
+<td class="text-left py-4">Upholstery Fabric<br/>Metal 17</td>
+<td class="text-center">60019200</td>
+<td class="text-center">Mtr</td>
+<td class="text-right">4</td>
+<td class="text-right">250</td>
+<td class="text-right">1000.00</td>
+<td class="text-right">0</td>
+<td class="text-right">1000.00</td>
+<td class="text-right">2.50</td>
+<td class="text-right">25.00</td>
+<td class="text-right">2.50</td>
+<td class="text-right">25.00</td>
+<td class="text-right font-bold">1050</td>
+</tr>
+<!-- Line Item 5 -->
+<tr>
+<td class="text-center">5</td>
+<td class="text-left py-4">Upholstery Fabric<br/>Denim 403</td>
+<td class="text-center">60019200</td>
+<td class="text-center">Mtr</td>
+<td class="text-right">13</td>
+<td class="text-right">450</td>
+<td class="text-right">5850.00</td>
+<td class="text-right">0</td>
+<td class="text-right">5850.00</td>
+<td class="text-right">2.50</td>
+<td class="text-right">146.25</td>
+<td class="text-right">2.50</td>
+<td class="text-right">146.25</td>
+<td class="text-right font-bold">6143</td>
+</tr>
+<!-- Line Item 6 -->
+<tr>
+<td class="text-center">6</td>
+<td class="text-left py-4">Upholstery Fabric<br/>Denim 413</td>
+<td class="text-center">60019200</td>
+<td class="text-center">Mtr</td>
+<td class="text-right">9</td>
+<td class="text-right">450</td>
+<td class="text-right">4050.00</td>
+<td class="text-right">0</td>
+<td class="text-right">4050.00</td>
+<td class="text-right">2.50</td>
+<td class="text-right">101.25</td>
+<td class="text-right">2.50</td>
+<td class="text-right">101.25</td>
+<td class="text-right font-bold">4253</td>
+</tr>
+<!-- Line Item 7 -->
+<tr>
+<td class="text-center">7</td>
+<td class="text-left py-4">Upholstery Fabric<br/>Denim 411</td>
+<td class="text-center">60019200</td>
+<td class="text-center">Mtr</td>
+<td class="text-right">5</td>
+<td class="text-right">450</td>
+<td class="text-right">2250.00</td>
+<td class="text-right">0</td>
+<td class="text-right">2250.00</td>
+<td class="text-right">2.50</td>
+<td class="text-right">56.25</td>
+<td class="text-right">2.50</td>
+<td class="text-right">56.25</td>
+<td class="text-right font-bold">2363</td>
+</tr>
+<!-- Table Footer / Total Row -->
+<tr class="font-bold text-lg">
+<td class="text-center py-2 uppercase tracking-widest text-xl" colspan="4">Total</td>
+<td class="text-right">46.0</td>
+<td></td>
+<td class="text-right">18900.00</td>
+<td></td>
+<td class="text-right">18900.00</td>
+<td></td>
+<td class="text-right">472.50</td>
+<td></td>
+<td class="text-right">472.50</td>
+<td class="text-right">19845</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- END: Main Items Table -->
+<!-- BEGIN: Bottom Section -->
+<div class="grid grid-cols-5 border-l border-r border-b border-ledger">
+<!-- Amount in Words -->
+<div class="col-span-3 border-r border-ledger">
+<div class="bg-gray-50 border-b border-ledger p-1 text-center font-bold text-xs">Total Invoice amount in words</div>
+<div class="p-4 text-center font-semibold text-sm">
+        Nineteen thousand eight hundred forty five
+      </div>
+<!-- Bank Details -->
+<div class="border-t border-ledger">
+<div class="bg-gray-50 border-b border-ledger p-1 text-center font-bold text-xs">Bank Details</div>
+<div class="p-2 space-y-0.5">
+<p class="text-xs font-bold uppercase">KOTAK MAHINDRA BANK</p>
+<p class="text-xs font-bold">Bank A/C: 1548180513</p>
+<p class="text-xs font-bold">Bank IFSC: KKBK0003564</p>
+</div>
+</div>
+</div>
+<!-- Final Calculation Summary -->
+<div class="col-span-2">
+<div class="divide-y divide-ledger">
+<div class="grid grid-cols-2 text-xs font-bold">
+<div class="p-1 px-2">Total Amount before Tax</div>
+<div class="p-1 px-2 text-right">18900</div>
+</div>
+<div class="grid grid-cols-2 text-xs font-bold">
+<div class="p-1 px-2">Add: CGST</div>
+<div class="p-1 px-2 text-right">473</div>
+</div>
+<div class="grid grid-cols-2 text-xs font-bold">
+<div class="p-1 px-2">Add: SGST</div>
+<div class="p-1 px-2 text-right">473</div>
+</div>
+<div class="grid grid-cols-2 text-xs font-bold">
+<div class="p-1 px-2 border-b border-ledger">Total Tax Amount</div>
+<div class="p-1 px-2 text-right border-b border-ledger">945</div>
+</div>
+<div class="grid grid-cols-2 text-xs font-bold">
+<div class="p-1 px-2">Round off</div>
+<div class="p-1 px-2 text-right"></div>
+</div>
+<div class="grid grid-cols-2 text-sm font-black bg-gray-50">
+<div class="p-1 px-2">Total Amount after Tax:</div>
+<div class="p-1 px-2 text-right font-black">19845</div>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Bottom Section -->
+<!-- BEGIN: Footer Terms & Signatory -->
+<div class="grid grid-cols-5 border-l border-r border-b border-ledger min-h-[120px]">
+<div class="col-span-3 p-4 flex flex-col justify-center items-center space-y-1">
+<h3 class="text-xs font-bold underline">Terms &amp; conditions</h3>
+<p class="text-xs font-bold">Our Reponsibilities ceases as goods leave our premises</p>
+<p class="text-xs font-bold">Subject to Jaipur Jurisdiction</p>
+</div>
+<div class="col-span-2 border-l border-ledger relative p-4 flex flex-col items-center">
+<div class="text-[8px] italic text-center mb-6">Certified that the particulars given above are true and correct</div>
+<div class="font-bold text-xs uppercase">For ARK ENTERPRISES</div>
+<div class="absolute bottom-2 font-bold text-xs border-t border-ledger w-4/5 pt-1 text-center">
+        Authorised signatory
+      </div>
+</div>
+</div>
+<!-- END: Footer Terms & Signatory -->
+</div>
+<!-- END: Invoice Container -->
+</body></html>

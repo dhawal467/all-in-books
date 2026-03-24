@@ -7,7 +7,10 @@ export default function InvoiceSettings() {
     name: '',
     address: '',
     phone: '',
-    gstin: ''
+    gstin: '',
+    bankName: '',
+    bankAccount: '',
+    bankIfsc: ''
   });
 
   useEffect(() => {
@@ -83,6 +86,47 @@ export default function InvoiceSettings() {
               className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-accent focus:bg-white transition-colors uppercase"
               placeholder="e.g. 29ABCDE1234F1Z5"
             />
+          </div>
+        </div>
+
+        <div className="pt-2 border-t border-gray-100 mt-2">
+          <h3 className="text-sm font-semibold text-primary mb-3">Bank Details</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Bank Name</label>
+              <input
+                type="text"
+                name="bankName"
+                value={details.bankName || ''}
+                onChange={handleChange}
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-accent focus:bg-white transition-colors"
+                placeholder="e.g. KOTAK MAHINDRA BANK"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Account No.</label>
+                <input
+                  type="text"
+                  name="bankAccount"
+                  value={details.bankAccount || ''}
+                  onChange={handleChange}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-accent focus:bg-white transition-colors"
+                  placeholder="e.g. 1548180513"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">IFSC Code</label>
+                <input
+                  type="text"
+                  name="bankIfsc"
+                  value={details.bankIfsc || ''}
+                  onChange={handleChange}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-accent focus:bg-white transition-colors uppercase"
+                  placeholder="e.g. KKBK0003564"
+                />
+              </div>
+            </div>
           </div>
         </div>
 

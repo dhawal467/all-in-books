@@ -66,8 +66,18 @@ function InvoiceDetail({ invoice }) {
   if (!invoice) return null;
 
   const party = parties.find(p => p.id === invoice.partyId);
-  // Default mock business info if none is stored globally
-  const business = { name: 'All in Books', address: 'Bangalore, India' };
+  const [business, setBusiness] = useState({ name: 'All in Books', address: 'Bangalore, India' });
+
+  useEffect(() => {
+    const saved = localStorage.getItem('businessDetails');
+    if (saved) {
+      try {
+        setBusiness(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to parse businessDetails', e);
+      }
+    }
+  }, []);
 
   const handleShare = async () => {
     setIsSharing(true);

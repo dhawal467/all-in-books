@@ -15,7 +15,7 @@ function todayISO() {
 }
 
 function createBlankItem() {
-  return { id: generateUUID(), description: '', qty: '1', rate: '' };
+  return { id: generateUUID(), description: '', hsnCode: '', uom: 'Nos', qty: '1', rate: '' };
 }
 
 export default function InvoiceForm({ onSave }) {
@@ -98,6 +98,8 @@ export default function InvoiceForm({ onSave }) {
     try {
       const finalLineItems = validItems.map((item) => ({
         description: item.description.trim(),
+        hsnCode: item.hsnCode?.trim() || '',
+        uom: item.uom?.trim() || 'Nos',
         qty: Number(item.qty),
         rate: Number(item.rate),
         lineTotal: Math.round(Number(item.qty) * Number(item.rate) * 100) / 100,
@@ -131,12 +133,16 @@ export default function InvoiceForm({ onSave }) {
 
   return (
     <div className="pb-safe">
-      {/* Invoice Number (read-only) */}
+      {/* Invoice Number (editable) */}
       <div className="px-4 pb-4">
         <label className="block text-sm font-medium text-primary mb-1">Invoice #</label>
-        <div className="w-full p-3 bg-primary/5 border border-transparent rounded-[12px] text-sm font-semibold text-primary">
-          {invoiceNumber || '…'}
-        </div>
+        <input
+          type="text"
+          value={invoiceNumber || ''}
+          onChange={(e) => setInvoiceNumber(e.target.value)}
+          className="w-full p-3 bg-[#F4F8FA] border border-[#B8D0E8] rounded-[12px] focus:outline-none focus:ring-1 focus:ring-primary text-primary font-semibold"
+          placeholder="e.g. AIB-0001"
+        />
       </div>
 
       {/* Party Selector */}
