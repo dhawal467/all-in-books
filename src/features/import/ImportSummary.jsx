@@ -1,9 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle, RotateCcw } from 'lucide-react';
+import { db } from '../../db/db.js';
+
+const UNDO_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 export default function ImportSummary({ batchId, rowCount, onDone, onUndo }) {
   const [isUndoing, setIsUndoing] = useState(false);
   const [hasUndone, setHasUndone] = useState(false);
+  const [canUndo, setCanUndo] = useState(true);
+
+  useEffect(() => {
+    const checkUndoWindow = async () => {
+      const batch = await db.importBatches.get(batchId);
+      if (!batch || Date.now() - batch.importedAt > UNDO_WINDOW_MS) {
+        setCanUndo(false);
+      }
+    };
+    checkUndoWindow();
+  }, [batchId]);
 
   const handleUndo = async () => {
     try {
@@ -54,18 +68,20 @@ export default function ImportSummary({ batchId, rowCount, onDone, onUndo }) {
         >
           Done
         </button>
-        <button
-          onClick={handleUndo}
-          disabled={isUndoing}
-          className="w-full flex justify-center items-center gap-2 py-3 px-4 bg-white border border-red-100 text-red-600 font-semibold rounded-xl hover:bg-red-50 transition-colors disabled:opacity-50"
-        >
-          {isUndoing ? (
-            <div className="w-4 h-4 border-2 border-red-600 rounded-full border-t-transparent animate-spin" />
-          ) : (
-             <RotateCcw size={18} />
-          )}
-          Undo Import
-        </button>
+        {canUndo && (
+          <button
+            onClick={handleUndo}
+            disabled={isUndoing}
+            className="w-full flex justify-center items-center gap-2 py-3 px-4 bg-white border border-red-100 text-red-600 font-semibold rounded-xl hover:bg-red-50 transition-colors disabled:opacity-50"
+          >
+            {isUndoing ? (
+              <div className="w-4 h-4 border-2 border-red-600 rounded-full border-t-transparent animate-spin" />
+            ) : (
+               <RotateCcw size={18} />
+            )}
+            Undo Import
+          </button>
+        )}
       </div>
     </div>
   );

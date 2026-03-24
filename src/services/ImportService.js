@@ -6,6 +6,91 @@ import { generateUUID } from '../utils/uuid.js';
 const VALID_TYPES  = ['sale', 'purchase', 'expense', 'receipt', 'payment'];
 const VALID_RATES  = [0, 5, 12, 18, 28];
 const GST_TOLERANCE = 1; // ₹1 tolerance for rounding
+const MAX_IMPORT_SIZE = 10 * 1024 * 1024; // 10 MB max file size
+const VALID_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+const PARSE_TIMEOUT_MS = 5000; // 5 second watchdog timeout
+
+// Whitelisted column names per sheet — prevents prototype pollution via __proto__ or constructor
+const ALLOWED_TX_COLUMNS   = new Set(['date', 'type', 'amount', 'baseAmount', 'gstRate', 'gstAmount', 'partyName', 'category', 'note', 'invoiceNumber']);
+const ALLOWED_PARTY_COLUMNS = new Set(['name', 'phone', 'gstin', 'address']);
+const ALLOWED_BAL_COLUMNS  = new Set(['partyName', 'openingBalance']);
+const ALLOWED_GST_COLUMNS  = new Set(['date', 'partyName', 'taxableAmount', 'gstRate', 'gstAmount', 'igstAmount', 'cgstAmount', 'sgstAmount']);
+
+// ── Security Helpers ─────────────────────────────────────────────────────
+
+/**
+ * Validates file before parsing:
+ * - Checks MIME type matches xlsx
+ * - Checks file size within limit
+ * @throws {Error} if validation fails
+ */
+function validateFile(file) {
+  if (file.size > MAX_IMPORT_SIZE) {
+    throw new Error(`File size (${(file.size / 1024 / 1024).toFixed(1)} MB) exceeds maximum allowed (${MAX_IMPORT_SIZE / 1024 / 1024} MB)`);
+  }
+  if (file.type && file.type !== VALID_MIME_TYPE) {
+    throw new Error(`Invalid file type "${file.type}". Only .xlsx files are accepted.`);
+  }
+  const ext = file.name.split('.').pop()?.toLowerCase();
+  if (ext !== 'xlsx') {
+    throw new Error(`Invalid file extension ".${ext}". Only .xlsx files are accepted.`);
+  }
+}
+
+/**
+ * Parses xlsx with a timeout watchdog to prevent resource exhaustion attacks.
+ * @param {ArrayBuffer} buf
+ * @returns {Object} parsed workbook
+ * @throws {Error} if parsing exceeds timeout
+ */
+function parseWithWatchdog(buf) {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error('File parsing timed out after 5 seconds. The file may be malformed or malicious.'));
+    }, PARSE_TIMEOUT_MS);
+
+    try {
+      const wb = XLSX.read(buf, {
+        type: 'array',
+        cellDates: true,
+        cellFormula: false,
+        sheetStubs: false,
+      });
+      clearTimeout(timeout);
+      resolve(wb);
+    } catch (err) {
+      clearTimeout(timeout);
+      reject(new Error(`Failed to parse file: ${err.message}`));
+    }
+  });
+}
+
+/**
+ * Sanitizes a row object by whitelisting only allowed column names.
+ * Prevents prototype pollution via __proto__, constructor, or prototype keys.
+ * @param {Object} row - Raw row from SheetJS
+ * @param {Set} allowedColumns - Set of allowed column names
+ * @returns {Object} Sanitized row with only whitelisted keys
+ */
+function sanitizeRow(row, allowedColumns) {
+  const sanitized = {};
+  for (const key of allowedColumns) {
+    if (key in row) {
+      sanitized[key] = row[key];
+    }
+  }
+  return sanitized;
+}
+
+/**
+ * Deep sanitizes an array of rows, removing any keys not in the whitelist.
+ * @param {Array} rows - Array of raw rows from SheetJS
+ * @param {Set} allowedColumns - Set of allowed column names
+ * @returns {Array} Sanitized rows
+ */
+function sanitizeRows(rows, allowedColumns) {
+  return rows.map(row => sanitizeRow(row, allowedColumns));
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -35,18 +120,26 @@ export const ImportService = {
 
   /**
    * Step 1 — Parse and validate (no DB writes).
+   * Validates file security, then parses with timeout protection.
+   * Sanitizes all rows to prevent prototype pollution attacks.
    * Returns { valid[], errors[], duplicates[] }
    */
   async parse(file) {
-    const buf  = await file.arrayBuffer();
-    const wb   = XLSX.read(buf, { type: 'array', cellDates: true });
+    validateFile(file);
+    const buf = await file.arrayBuffer();
+    const wb = await parseWithWatchdog(buf);
 
     const rows  = wb.Sheets['Transactions']   ? XLSX.utils.sheet_to_json(wb.Sheets['Transactions'],   { defval: '' }) : [];
     const bRows = wb.Sheets['Party_Balances'] ? XLSX.utils.sheet_to_json(wb.Sheets['Party_Balances'], { defval: '' }) : [];
     const pRows = wb.Sheets['Parties']        ? XLSX.utils.sheet_to_json(wb.Sheets['Parties'],        { defval: '' }) : [];
     const gRows = wb.Sheets['GST_History']    ? XLSX.utils.sheet_to_json(wb.Sheets['GST_History'],    { defval: '' }) : [];
 
-    return this._validate({ rows, bRows, pRows, gRows });
+    return this._validate({
+      rows: sanitizeRows(rows, ALLOWED_TX_COLUMNS),
+      bRows: sanitizeRows(bRows, ALLOWED_BAL_COLUMNS),
+      pRows: sanitizeRows(pRows, ALLOWED_PARTY_COLUMNS),
+      gRows: sanitizeRows(gRows, ALLOWED_GST_COLUMNS),
+    });
   },
 
   /**

@@ -5,6 +5,9 @@ import { formatINR } from '../../utils/currency';
 import { Share2, Phone, Calendar } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import DOMPurify from 'dompurify';
+
+const sanitize = (str) => DOMPurify.sanitize(str ?? '', { ALLOWED_TAGS: [] });
 
 export default function PartyStatement() {
   const modalState = useUiStore(state => state.modals['partyStatement']);
@@ -99,17 +102,18 @@ export default function PartyStatement() {
       }
 
       const pdfBlob = pdf.output('blob');
-      const file = new File([pdfBlob], `${party.name.replace(/\s+/g, '_')}_Statement.pdf`, { type: 'application/pdf' });
+      const sanitizedName = sanitize(party.name).replace(/\s+/g, '_');
+      const file = new File([pdfBlob], `${sanitizedName}_Statement.pdf`, { type: 'application/pdf' });
 
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: `${party.name} Statement`,
-          text: `Here is the statement for ${party.name}.`
+          title: `${sanitize(party.name)} Statement`,
+          text: `Here is the statement for ${sanitize(party.name)}.`
         });
       } else {
         // Fallback for browsers/environments that don't support native sharing
-        pdf.save(`${party.name.replace(/\s+/g, '_')}_Statement.pdf`);
+        pdf.save(`${sanitizedName}_Statement.pdf`);
         showToast('PDF downloaded successfully');
       }
 
@@ -134,10 +138,10 @@ export default function PartyStatement() {
           
           {/* Statement Header */}
           <div className="border-b border-gray-200 pb-4 mb-4">
-            <h2 className="text-xl font-bold text-primary">{party.name}</h2>
+            <h2 className="text-xl font-bold text-primary">{sanitize(party.name)}</h2>
             {party.phone && (
               <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
-                <Phone size={14} /> {party.phone}
+                <Phone size={14} /> {sanitize(party.phone)}
               </p>
             )}
             
@@ -190,7 +194,7 @@ export default function PartyStatement() {
                     <td className="px-3 py-3">
                       <div className="font-medium">{new Date(tx.date).toLocaleDateString('en-GB')}</div>
                       <div className="text-xs text-gray-500 mt-0.5 line-clamp-2">
-                        {tx.type.toUpperCase()}{tx.note ? ` - ${tx.note}` : ''}
+                        {tx.type.toUpperCase()}{tx.note ? ` - ${sanitize(tx.note)}` : ''}
                       </div>
                       {tx.isImported && (
                         <span className="inline-block mt-1 text-[9px] font-bold uppercase bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">

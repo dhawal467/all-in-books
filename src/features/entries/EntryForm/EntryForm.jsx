@@ -49,7 +49,8 @@ export default function EntryForm({ defaultType, onSave }) {
   };
 
   const handleSave = async () => {
-    // --- Validation ---
+    if (isSaving) return;
+
     const numericAmount = parseFloat(amount);
     if (!amount || isNaN(numericAmount) || numericAmount <= 0) {
       setAmountError('Please enter a valid amount greater than 0.');

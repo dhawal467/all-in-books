@@ -74,15 +74,38 @@ export async function generate(invoiceData, business, party) {
       format: 'a4',
     });
 
-    // Scale the captured canvas image to fit A4 precisely
+    // Calculate image dimensions for pagination
+    const imgWidth = A4_WIDTH_MM;
+    const imgHeight = (canvas.height * A4_WIDTH_MM) / canvas.width;
+    const pageHeight = A4_HEIGHT_MM;
+
+    // Add pages as needed for long content
+    let heightLeft = imgHeight;
+    let position = 0;
+
     pdf.addImage(
       canvas.toDataURL('image/png'),
       'PNG',
-      0,       // x
-      0,       // y
-      A4_WIDTH_MM,
-      A4_HEIGHT_MM
+      0,           // x
+      position,    // y
+      imgWidth,
+      imgHeight
     );
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(
+        canvas.toDataURL('image/png'),
+        'PNG',
+        0,
+        position,
+        imgWidth,
+        imgHeight
+      );
+      heightLeft -= pageHeight;
+    }
 
     // 5. Export as Blob + Object URL
     const blob = pdf.output('blob');

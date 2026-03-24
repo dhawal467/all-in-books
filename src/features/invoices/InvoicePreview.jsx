@@ -1,5 +1,8 @@
 import React from 'react';
+import DOMPurify from 'dompurify';
 import { formatINR } from '../../utils/currency';
+
+const sanitize = (str) => DOMPurify.sanitize(str ?? '', { ALLOWED_TAGS: [] });
 
 export default function InvoicePreview({ invoice, business, party }) {
   if (!invoice) return <div style={{ padding: '20px' }}>No invoice data provided.</div>;
@@ -26,10 +29,10 @@ export default function InvoicePreview({ invoice, business, party }) {
         {/* Left: Business Info */}
         <div style={{ flex: 1 }}>
           <h1 style={{ margin: '0 0 5px 0', fontSize: '24px', color: '#111' }}>
-            {safeBusiness.name}
+            {sanitize(safeBusiness.name)}
           </h1>
           <p style={{ margin: '0', fontSize: '14px', color: '#666', whiteSpace: 'pre-wrap' }}>
-            {safeBusiness.address}
+            {sanitize(safeBusiness.address)}
           </p>
         </div>
 
@@ -59,10 +62,10 @@ export default function InvoicePreview({ invoice, business, party }) {
           Bill To:
         </h3>
         <p style={{ margin: '0 0 3px 0', fontSize: '16px', fontWeight: 'bold', color: '#222' }}>
-          {safeParty.name}
+          {sanitize(safeParty.name)}
         </p>
         <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>
-          {safeParty.phone ? `Phone: ${safeParty.phone}` : ''}
+          {safeParty.phone ? `Phone: ${sanitize(safeParty.phone)}` : ''}
         </p>
       </div>
 
@@ -86,10 +89,10 @@ export default function InvoicePreview({ invoice, business, party }) {
                   {index + 1}
                 </td>
                 <td style={{ padding: '12px 10px', fontSize: '14px', color: '#222', borderBottom: '1px solid #EBEBEB' }}>
-                  {item.description}
+                  {sanitize(item.description)}
                 </td>
                 <td style={{ padding: '12px 10px', fontSize: '14px', color: '#444', textAlign: 'right', borderBottom: '1px solid #EBEBEB' }}>
-                  {item.qty}
+                  {sanitize(String(item.qty))}
                 </td>
                 <td style={{ padding: '12px 10px', fontSize: '14px', color: '#444', textAlign: 'right', borderBottom: '1px solid #EBEBEB' }}>
                   {formatINR(item.rate, false)}

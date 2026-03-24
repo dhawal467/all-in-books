@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import { db } from '../db/db.js';
+import { computeExportHash, setLastExportHash } from '../utils/integrity.js';
 
 const INFLOW_TYPES  = ['sale', 'receipt'];
 const OUTFLOW_TYPES = ['purchase', 'expense', 'payment'];
@@ -7,12 +8,37 @@ const OUTFLOW_TYPES = ['purchase', 'expense', 'payment'];
 class ExportService {
   /**
    * Generates a workbook containing all data and returns it as an ArrayBuffer.
+   * Uses a read transaction to ensure consistent snapshot across all tables,
+   * preventing partial data capture during concurrent writes (e.g., imports).
+   * Records a hash of the exported data for integrity verification.
    */
   async generate(bookId = 'main') {
     const wb = XLSX.utils.book_new();
 
+    // Read all data within a single transaction for snapshot consistency
+    const { transactions, parties, invoices, categories } = await db.transaction(
+      'r',
+      db.transactions,
+      db.parties,
+      db.invoices,
+      db.categories,
+      async () => ({
+        transactions: await db.transactions.where('bookId').equals(bookId).toArray(),
+        parties:      await db.parties.where('bookId').equals(bookId).toArray(),
+        invoices:     await db.invoices.where('bookId').equals(bookId).toArray(),
+        categories:   await db.categories.where('bookId').equals(bookId).toArray(),
+      })
+    );
+
+    // Compute integrity hash before generating xlsx
+    const exportHash = await computeExportHash({
+      transactions,
+      parties,
+      invoices,
+      timestamp: Date.now()
+    });
+
     // 1. Transactions
-    const transactions = await db.transactions.where('bookId').equals(bookId).toArray();
     const txSheet = XLSX.utils.json_to_sheet(transactions.map(t => ({
       ID: t.id,
       Date: t.date,
@@ -27,7 +53,6 @@ class ExportService {
     XLSX.utils.book_append_sheet(wb, txSheet, 'Transactions');
 
     // 2. Parties (with calculated Outstanding Balance)
-    const parties = await db.parties.where('bookId').equals(bookId).toArray();
     const partyData = parties.map(party => {
       const partyTx = transactions.filter(t => t.partyId === party.id);
       
@@ -54,7 +79,6 @@ class ExportService {
     XLSX.utils.book_append_sheet(wb, partySheet, 'Parties');
 
     // 3. Invoices
-    const invoices = await db.invoices.where('bookId').equals(bookId).toArray();
     const invoiceSheet = XLSX.utils.json_to_sheet(invoices.map(inv => ({
       ID: inv.id,
       Invoice_Number: inv.invoiceNumber,
@@ -67,7 +91,6 @@ class ExportService {
     XLSX.utils.book_append_sheet(wb, invoiceSheet, 'Invoices');
 
     // 4. Categories
-    const categories = await db.categories.where('bookId').equals(bookId).toArray();
     const categorySheet = XLSX.utils.json_to_sheet(categories.map(cat => ({
       ID: cat.id,
       Name: cat.name,
@@ -77,7 +100,11 @@ class ExportService {
 
     // Write to ArrayBuffer
     const buffer = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
-    return buffer;
+    
+    // Record the export hash for integrity verification
+    setLastExportHash(exportHash);
+    
+    return { buffer, hash: exportHash };
   }
 
   /**

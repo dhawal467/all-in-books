@@ -1,27 +1,60 @@
 import { create } from 'zustand';
 import { db } from '../db/db.js';
+import { 
+  computeRecordHash, 
+  verifyRecordHash, 
+  CRITICAL_FIELDS,
+  setIntegrityStatus,
+  getIntegrityStatus 
+} from '../utils/integrity.js';
 
 export const usePartyStore = create((set, get) => ({
   parties: [],
   loading: false,
+  integrityWarning: false,
 
   load: async () => {
     set({ loading: true });
-    const parties = await db.parties.where('bookId').equals('main').toArray();
+    let parties = await db.parties.where('bookId').equals('main').toArray();
+    
+    let hasTampered = false;
+    for (const party of parties) {
+      const isValid = await verifyRecordHash(party, CRITICAL_FIELDS.party);
+      if (!isValid) {
+        party._tampered = true;
+        hasTampered = true;
+      }
+    }
+    
+    if (hasTampered) {
+      setIntegrityStatus(true);
+      set({ integrityWarning: true });
+    } else if (getIntegrityStatus()) {
+      setIntegrityStatus(false);
+      set({ integrityWarning: false });
+    }
+    
     set({ parties, loading: false });
   },
 
   add: async (data) => {
-    const partyId = await db.parties.add({
+    const partyData = {
       ...data,
       bookId: 'main',
       createdAt: Date.now()
-    });
+    };
+    partyData._hash = await computeRecordHash(partyData, CRITICAL_FIELDS.party);
+    
+    const partyId = await db.parties.add(partyData);
     await get().load();
     return partyId;
   },
 
   update: async (id, changes) => {
+    const existing = await db.parties.get(id);
+    if (existing) {
+      changes._hash = await computeRecordHash({ ...existing, ...changes }, CRITICAL_FIELDS.party);
+    }
     await db.parties.update(id, changes);
     await get().load();
   },
@@ -30,7 +63,6 @@ export const usePartyStore = create((set, get) => ({
     if (!query) return [];
     const lowerQuery = query.toLowerCase();
     
-    // Fuzzy match on name directly from indexedDB array (since we cache it or query it)
     const parties = await db.parties.where('bookId').equals('main').toArray();
     return parties.filter(p => p.name.toLowerCase().includes(lowerQuery));
   },

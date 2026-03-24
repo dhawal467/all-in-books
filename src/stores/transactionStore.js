@@ -1,26 +1,49 @@
 import { create } from 'zustand';
 import { db } from '../db/db.js';
 import { generateUUID } from '../utils/uuid.js';
+import { 
+  computeRecordHash, 
+  verifyRecordHash, 
+  markRecordTampered, 
+  CRITICAL_FIELDS,
+  setIntegrityStatus,
+  getIntegrityStatus 
+} from '../utils/integrity.js';
 
 export const useTransactionStore = create((set, get) => ({
   transactions: [],
   loading: false,
+  integrityWarning: false,
 
   load: async ({ type, from, to, partyId } = {}) => {
     set({ loading: true });
-    // Dexie orderBy gets everything, then we filter in memory or via where
     let query = db.transactions.where('bookId').equals('main');
     
-    // Using simple filter chaining since bookId is our base index
     if (type)    query = query.filter(t => t.type === type);
     if (partyId) query = query.filter(t => t.partyId === partyId);
     if (from)    query = query.filter(t => t.date >= from);
     if (to)      query = query.filter(t => t.date <= to);
     
-    // Sort logic normally .orderBy('date').reverse(), but we used .where() already
-    // so we get array and sort manually for robust behavior
     let transactions = await query.toArray();
-    transactions.sort((a, b) => b.date.localeCompare(a.date)); // Descending by date
+    
+    let hasTampered = false;
+    for (const tx of transactions) {
+      const isValid = await verifyRecordHash(tx, CRITICAL_FIELDS.transaction);
+      if (!isValid) {
+        tx._tampered = true;
+        hasTampered = true;
+      }
+    }
+    
+    if (hasTampered) {
+      setIntegrityStatus(true);
+      set({ integrityWarning: true });
+    } else if (getIntegrityStatus()) {
+      setIntegrityStatus(false);
+      set({ integrityWarning: false });
+    }
+    
+    transactions.sort((a, b) => b.date.localeCompare(a.date));
 
     set({ transactions, loading: false });
   },
@@ -34,16 +57,11 @@ export const useTransactionStore = create((set, get) => ({
       isImported: data.isImported || false,
     };
     
-    // Make sure generateId is called if not provided
     if (!entry.id) {
-       // but wait, id is auto-increment in dexie schemas (++id), so we don't need a UUID unless requested
-       // Although TIP says we use generateId(), let's not break auto-increment if it works. 
-       // Actually TIP says: import { generateId } ... const entry = { ...data, id: generateId(), ... }
-       // So we will add the id but let auto-increment handle ++id. 
-       // If id is string Dexie might complain on ++id if expecting number. Wait, Dexie handles string ++id fine or we can just omit id.
-       // The TIP says "const entry = { ...data, id: generateId(), createdAt: Date.now(), updatedAt: Date.now(), isImported: false };"
        entry.id = data.id || generateUUID(); 
     }
+    
+    entry._hash = await computeRecordHash(entry, CRITICAL_FIELDS.transaction);
 
     await db.transactions.add(entry);
     await get().load();
@@ -51,6 +69,10 @@ export const useTransactionStore = create((set, get) => ({
   },
 
   update: async (id, changes) => {
+    const existing = await db.transactions.get(id);
+    if (existing) {
+      changes._hash = await computeRecordHash({ ...existing, ...changes }, CRITICAL_FIELDS.transaction);
+    }
     await db.transactions.update(id, { ...changes, updatedAt: Date.now() });
     await get().load();
   },
@@ -61,8 +83,7 @@ export const useTransactionStore = create((set, get) => ({
   },
 
   getTodaySummary: async () => {
-    // Current local date YYYY-MM-DD
-    const today = new Date().toLocaleDateString('en-CA'); // Gets YYYY-MM-DD reliably
+    const today = new Date().toLocaleDateString('en-CA');
     const todayTx = await db.transactions
       .where('bookId')
       .equals('main')

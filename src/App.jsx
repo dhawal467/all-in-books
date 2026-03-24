@@ -10,6 +10,7 @@ import FAB from './components/FAB';
 import BottomNav from './components/BottomNav';
 import StatusDot from './components/StatusDot';
 import EmptyState from './components/EmptyState';
+import IntegrityWarning from './components/IntegrityWarning';
 import EntryForm from './features/entries/EntryForm/EntryForm';
 import EntriesPage from './features/entries/EntriesPage';
 import EntryDetail from './features/entries/EntryDetail';
@@ -103,6 +104,9 @@ function App() {
           </button>
         </div>
       </header>
+
+      {/* Integrity Warning Banner */}
+      <IntegrityWarning />
 
       {/* Main Content Area */}
       <main className="pt-16 px-4 max-w-md mx-auto w-full">

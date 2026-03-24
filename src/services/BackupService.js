@@ -64,8 +64,8 @@ const BackupService = {
     }
     const token = await DriveAuth.getToken();
 
-    // 2. Generate the xlsx buffer from all app data
-    const buffer = await ExportService.generate(bookId);
+    // 2. Generate the xlsx buffer from all app data (hash is recorded in ExportService)
+    const { buffer } = await ExportService.generate(bookId);
 
     // 3. Get or create the "All in Books" Drive folder
     const folderId = await this._getOrCreateFolder(token);

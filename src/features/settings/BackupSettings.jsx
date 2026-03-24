@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import DriveAuth from '../../services/DriveAuth';
 import BackupService from '../../services/BackupService';
+import ExportService from '../../services/ExportService';
 import { useUiStore } from '../../stores/uiStore';
-import { Cloud, CloudOff, RefreshCw } from 'lucide-react';
+import { Cloud, CloudOff, RefreshCw, FileSpreadsheet } from 'lucide-react';
 
 export default function BackupSettings() {
   const [isConnected, setIsConnected] = useState(false);
@@ -42,6 +43,18 @@ export default function BackupSettings() {
       setIsConnected(false);
       setLastBackup(null);
       showToast('Google Drive disconnected', 'success');
+    }
+  };
+
+  const handleExcelExport = async () => {
+    try {
+      const buffer = await ExportService.generate();
+      const dateStr = new Date().toISOString().split('T')[0];
+      ExportService.downloadNow(buffer, `AllInBooks_Export_${dateStr}.xlsx`);
+      showToast('Excel export ready!', 'success');
+    } catch (err) {
+      console.error('Export failed:', err);
+      showToast('Export failed', 'error');
     }
   };
 
@@ -95,6 +108,19 @@ export default function BackupSettings() {
             >
               Disconnect
             </button>
+          </div>
+
+          <div className="pt-4 border-t border-gray-100">
+            <button
+              onClick={handleExcelExport}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-green-50 text-green-700 rounded-lg font-medium active:scale-[0.98] transition-all hover:bg-green-100 border border-green-100"
+            >
+              <FileSpreadsheet size={18} />
+              Export to Excel (.xlsx)
+            </button>
+            <p className="text-[10px] text-gray-500 text-center mt-2 italic">
+              Downloads all your data to this device (Offline)
+            </p>
           </div>
         </div>
       )}
